@@ -1,5 +1,5 @@
-var DomainNameRegistry = artifacts.require("./DomainNameRegistry.sol");
+var SmartNameRegistry = artifacts.require("./SmartNameRegistry.sol");
 
 module.exports = function(deployer) {
-  deployer.deploy(DomainNameRegistry);
+  deployer.deploy(SmartNameRegistry);
 };
