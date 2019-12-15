@@ -49,7 +49,7 @@ contract('SmartNameRegistry', function(accounts) {
 
         it("Register a smart name", async() => {
             await instance.register(toBytes(name1), toBytes(ext1))
-            const result_getSmartName = await instance.getSmartNameOf(toBytes(name1), toBytes(ext1))
+            const result_getSmartName = await instance.getSmartName(id1)
 
             const result_id = result_getSmartName[0]
             const result_name = result_getSmartName[1]
@@ -63,7 +63,7 @@ contract('SmartNameRegistry', function(accounts) {
             assert.equal(result_administrator_addr, administrator, 'The administrator of the smart name is not correct')
             assert.equal(result_record, administrator, 'The record of the smart name is not correct')
 
-            const result_getAdministrator = await instance.getAdministratorOf(toBytes(name1), toBytes(ext1))
+            const result_getAdministrator = await instance.getAdministratorOf(id1)
             const result_address = result_getAdministrator[0]
             const result_nbSmartName = result_getAdministrator[1]
             const result_wallet = result_getAdministrator[2]
@@ -85,7 +85,7 @@ contract('SmartNameRegistry', function(accounts) {
                 let name = smart[1]
                 let ext = smart[2]
 
-                let result_getSmartName = await instance.getSmartNameOf(toBytes(name), toBytes(ext))
+                let result_getSmartName = await instance.getSmartName(id)
 
                 let result_id = result_getSmartName[0]
                 let result_name = result_getSmartName[1]
@@ -99,7 +99,7 @@ contract('SmartNameRegistry', function(accounts) {
                 assert.equal(result_administrator_addr, administrator, 'The administrator of the smart name is not correct')
                 assert.equal(result_record, administrator, 'The record of the smart name is not correct')
     
-                const result_getAdministrator = await instance.getAdministratorOf(toBytes(name), toBytes(ext))
+                const result_getAdministrator = await instance.getAdministratorOf(id1)
                 const result_address = result_getAdministrator[0]
                 const result_nbSmartName = result_getAdministrator[1]
                 const result_wallet = result_getAdministrator[2]
@@ -129,10 +129,10 @@ contract('SmartNameRegistry', function(accounts) {
 
         it("Abandon a smart name", async() => {
             await instance.register(toBytes(name1), toBytes(ext1))
-            await instance.abandon(toBytes(name1), toBytes(ext1))
+            await instance.abandon(id1)
 
-            await catchRevert(instance.getSmartNameOf(toBytes(name1), toBytes(ext1)))
-            await catchRevert(instance.getAdministratorOf(toBytes(name1), toBytes(ext1)))
+            await catchRevert(instance.getSmartName(id1))
+            await catchRevert(instance.getAdministratorOf(id1))
             await catchRevert(instance.getAdministratorByAddress(administrator))
         })
 
@@ -141,10 +141,10 @@ contract('SmartNameRegistry', function(accounts) {
             await instance.register(toBytes(name2), toBytes(ext2))
             await instance.register(toBytes(name3), toBytes(ext3))
 
-            await instance.abandon(toBytes(name1), toBytes(ext1))
+            await instance.abandon(id1)
 
-            await catchRevert(instance.getSmartNameOf(toBytes(name1), toBytes(ext1)))
-            await catchRevert(instance.getAdministratorOf(toBytes(name1), toBytes(ext1)))
+            await catchRevert(instance.getSmartName(id1))
+            await catchRevert(instance.getAdministratorOf(id1))
 
             const result_getAdministrator = await instance.getAdministratorByAddress(administrator)
             const result_address = result_getAdministrator[0]
@@ -157,13 +157,13 @@ contract('SmartNameRegistry', function(accounts) {
         })
 
         it("Prevent to abandon a smart name which doesn't exist", async() => {
-            await catchRevert(instance.abandon(toBytes(name1), toBytes(ext1)))
+            await catchRevert(instance.abandon(id1))
          })
 
         it("Prevent to abandon a smart name if the caller is not the administrator", async() => {
             await instance.register(toBytes(name1), toBytes(ext1))
-            await instance.modifyAdministrator(toBytes(name1), toBytes(ext1), user)
-            await catchRevert(instance.abandon(toBytes(name2), toBytes(ext2)))
+            await instance.modifyAdministrator(id1, user)
+            await catchRevert(instance.abandon(id1))
          })
     })
 
@@ -174,14 +174,14 @@ contract('SmartNameRegistry', function(accounts) {
             await instance.register(toBytes(name1), toBytes(ext1))
             await instance.register(toBytes(name2), toBytes(ext2))
 
-            await instance.modifyAdministrator(toBytes(name1), toBytes(ext1),user)
+            await instance.modifyAdministrator(id1, user)
 
-            const result_getSmartName = await instance.getSmartNameOf(toBytes(name1), toBytes(ext1))
+            const result_getSmartName = await instance.getSmartName(id1)
             const result_administrator_addr = result_getSmartName[3]
 
             assert.equal(result_administrator_addr, user, 'The administrator of the smart name is not correct')
 
-            const result_getAdministrator = await instance.getAdministratorOf(toBytes(name1), toBytes(ext1))
+            const result_getAdministrator = await instance.getAdministratorOf(id1)
             const result_address = result_getAdministrator[0]
             const result_nbSmartName = result_getAdministrator[1]
             const result_wallet = result_getAdministrator[2]
@@ -202,23 +202,23 @@ contract('SmartNameRegistry', function(accounts) {
          })
 
         it("Modify the administrator of a smart name which doesn't exist", async() => {
-            await catchRevert(instance.modifyAdministrator(toBytes(name1), toBytes(ext1), user))
+            await catchRevert(instance.modifyAdministrator(id1, user))
          })
 
         it("Modify the administrator of a smart name with empty address", async() => {
             await instance.register(toBytes(name1), toBytes(ext1))
-            await catchRevert(instance.modifyAdministrator(toBytes(name1), toBytes(ext1), emptyAddress))
+            await catchRevert(instance.modifyAdministrator(id1, emptyAddress))
         })
 
         it("Modify the administrator of a smart name with the same administrator", async() => {
             await instance.register(toBytes(name1), toBytes(ext1))
-            await catchRevert(instance.modifyAdministrator(toBytes(name1), toBytes(ext1), administrator))
+            await catchRevert(instance.modifyAdministrator(id1, administrator))
         })
 
         it("Modify the administrator if the caller is not the administrator of the smart name", async() => {
             await instance.register(toBytes(name1), toBytes(ext1))
-            await instance.modifyAdministrator(toBytes(name1), toBytes(ext1), user)
-            await catchRevert(instance.modifyAdministrator(toBytes(name1), toBytes(ext1), administrator))
+            await instance.modifyAdministrator(id1, user)
+            await catchRevert(instance.modifyAdministrator(id1, administrator))
         })
     })
 
@@ -226,108 +226,34 @@ contract('SmartNameRegistry', function(accounts) {
 
          it("Modify the record of a smart name", async() => {
             await instance.register(toBytes(name1), toBytes(ext1))
-            await instance.modifyRecord(toBytes(name1), toBytes(ext1), record)
+            await instance.modifyRecord(id1, record)
 
-            const result_record = await instance.getRecordOf(toBytes(name1), toBytes(ext1))
+            const result_smartname = await instance.getSmartName(id1)
+            const result_record = result_smartname[4]
             assert.equal(result_record, record, 'The record of the smart name is not correct')
          })
 
 
         it("Modify the administrator of a smart name which doesn't exist", async() => {
-            await catchRevert(instance.modifyRecord(toBytes(name1), toBytes(ext1), record))
+            await catchRevert(instance.modifyRecord(id1, record))
          })
 
         it("Modify the record of a smart name with empty address", async() => {
             await instance.register(toBytes(name1), toBytes(ext1))
-            await catchRevert(instance.modifyAdministrator(toBytes(name1), toBytes(ext1), emptyRecord))
+            await catchRevert(instance.modifyAdministrator(id1, emptyRecord))
         })
 
         it("Modify the record of a smart name with the same record", async() => {
             await instance.register(toBytes(name1), toBytes(ext1))
-            await catchRevert(instance.modifyAdministrator(toBytes(name1), toBytes(ext1), administrator))
+            await catchRevert(instance.modifyAdministrator(id1, administrator))
         })
 
         it("Modify the record if the caller is not the administrator of the smart name", async() => {
             await instance.register(toBytes(name1), toBytes(ext1))
-            await instance.modifyAdministrator(toBytes(name1), toBytes(ext1), user)
-            await catchRevert(instance.modifyAdministrator(toBytes(name1), toBytes(ext1), record))
+            await instance.modifyAdministrator(id1, user)
+            await catchRevert(instance.modifyAdministrator(id1, record))
         })
 
-    })
-
-    describe("getWallet()", async() => { 
-
-        it("Get wallet", async() => {
-            await instance.register(toBytes(name1), toBytes(ext1))
-            await instance.register(toBytes(name2), toBytes(ext2))
-            await instance.register(toBytes(name3), toBytes(ext3))
-
-            const result_getWallet = await instance.getWallet()
-
-            const result_nb = result_getWallet[0]
-            const result_wallet= result_getWallet[1]
-
-            assert.equal(result_nb, 3, 'The number of smart names in the wallet is not correct')
-
-            assert.equal(result_wallet[0], id1, 'The id of smart names in the wallet is not correct')
-            assert.equal(result_wallet[1], id2, 'The id of smart names in the wallet is not correct')
-            assert.equal(result_wallet[2], id3, 'The id of smart names in the wallet is not correct')
-        }) 
-
-        it("Get wallet by address", async() => {
-            await instance.register(toBytes(name1), toBytes(ext1))
-            await instance.register(toBytes(name2), toBytes(ext2))
-            await instance.register(toBytes(name3), toBytes(ext3))
-
-            const result_getWallet = await instance.getWalletOf(administrator)
-
-            const result_nb = result_getWallet[0]
-            const result_wallet= result_getWallet[1]
-
-            assert.equal(result_nb, 3, 'The number of smart names in the in the wallet is not correct')
-
-            assert.equal(result_wallet[0], id1, 'The id of smart names in the wallet is not correct')
-            assert.equal(result_wallet[1], id2, 'The id of smart names in the wallet is not correct')
-            assert.equal(result_wallet[2], id3, 'The id of smart names in the wallet is not correct')
-        }) 
-
-        it("Get wallet of a no administrator", async() => {
-            await catchRevert(instance.getWalletOf(user));
-        }) 
-    })
-
-    describe("getRecord()", async() => { 
-        it("Get record of a smart name", async() => {
-            await instance.register(toBytes(name1), toBytes(ext1))
-
-            const result_record = await instance.getRecordOf(toBytes(name1), toBytes(ext1))
-         
-            assert.equal(result_record, administrator, 'The record of the smart name is not correct')
-        }) 
-
-        it("Get wallet of a smart name by id", async() => {
-            await instance.register(toBytes(name1), toBytes(ext1))
-
-            const result_record = await instance.getRecordById(id1)
-    
-            assert.equal(result_record, administrator, 'The record of the smart name is not correct')
-        }) 
-
-        it("Get wallet of a smart name with bad format", async() => {
-            await catchRevert(instance.getRecordOf(toBytes(emptyName), toBytes(emptyExt)))
-        }) 
-
-        it("Get wallet of a smart name which not exist", async() => {
-            await catchRevert(instance.getRecordOf(toBytes(name1), toBytes(ext1)))
-        })
-
-        it("Get wallet of a smart name by empty id", async() => {
-            await catchRevert(instance.getRecordById(emptyId))
-        }) 
-
-        it("Get wallet of a smart name by id which not exist", async() => {
-            await catchRevert(instance.getRecordById(id1))
-        }) 
     })
 
     describe("GetAdministrator()", async() => { 
@@ -351,7 +277,7 @@ contract('SmartNameRegistry', function(accounts) {
             await instance.register(toBytes(name1), toBytes(ext1))
             await instance.register(toBytes(name2), toBytes(ext2))
 
-            const result_getAdministrator = await instance.getAdministratorOf(toBytes(name1), toBytes(ext1))
+            const result_getAdministrator = await instance.getAdministratorOf(id1)
             const result_address = result_getAdministrator[0]
             const result_nbSmartName = result_getAdministrator[1]
             const result_wallet = result_getAdministrator[2]
@@ -378,7 +304,7 @@ contract('SmartNameRegistry', function(accounts) {
         })  
 
         it("Get administrator of smart name which not exist", async() => {
-            await catchRevert(instance.getAdministratorOf(toBytes(name1), toBytes(ext1)))
+            await catchRevert(instance.getAdministratorOf(id1))
         })  
 
         it("Get administrator by address which not exist", async() => {
@@ -388,34 +314,13 @@ contract('SmartNameRegistry', function(accounts) {
         it("Get administrator with empty address", async() => {
             await catchRevert(instance.getAdministratorByAddress(emptyAddress))
         })  
-
-        it("Get administrator by smart name with bad format", async() => {
-            await catchRevert(instance.getAdministratorOf(toBytes(emptyName), toBytes(emptyExt)))
-        })  
     })
 
     describe("GetSmartName()", async() => { 
 
         it("Get smart name by name and extension", async() => {
             await instance.register(toBytes(name1), toBytes(ext1))
-            const result_getSmartName = await instance.getSmartNameOf(toBytes(name1), toBytes(ext1))
-
-            const result_id = result_getSmartName[0]
-            const result_name = result_getSmartName[1]
-            const result_ext = result_getSmartName[2]
-            const result_administrator_addr = result_getSmartName[3]
-            const result_record = result_getSmartName[4]
-
-            assert.equal(result_id, id1, 'The id of the smart name is not correct')
-            assert.equal(toAscii(result_name), name1, 'The name of the smart name is not correct')
-            assert.equal(toAscii(result_ext), ext1, 'The extension of the smart name is not correct')
-            assert.equal(result_administrator_addr, administrator, 'The administrator of the smart name is not correct')
-            assert.equal(result_record, administrator, 'The record of the smart name is not correct')
-        }) 
-
-        it("Get smart name by id", async() => {
-            await instance.register(toBytes(name1), toBytes(ext1))
-            const result_getSmartName = await instance.getSmartNameById(id1)
+            const result_getSmartName = await instance.getSmartName(id1)
 
             const result_id = result_getSmartName[0]
             const result_name = result_getSmartName[1]
@@ -431,27 +336,22 @@ contract('SmartNameRegistry', function(accounts) {
         }) 
 
         it("Get smart name which not exist", async() => {
-            await catchRevert(instance.getSmartNameOf(toBytes(name1), toBytes(ext1)))
-        }) 
-
-        it("Get smart name by id which not exist", async() => {
-            await catchRevert(instance.getSmartNameById(id1))
+            await catchRevert(instance.getSmartName(id1))
         }) 
 
         it("Get smart name with bad format", async() => {
-            await catchRevert(instance.getSmartNameOf(toBytes(emptyName), toBytes(emptyExt)))
+            await catchRevert(instance.getSmartName(id1))
         }) 
-
     })
 
     describe("GetIdOfSmartName()", async() => { 
         
         it("Get id of a smart name", async() => {
-            const result_id = await instance.getIdOfSmartName(toBytes(name1), toBytes(ext1))
+            const result_id = await instance.getIdOf(toBytes(name1), toBytes(ext1))
             assert.equal(result_id, id1, 'The id of the smart name is not correct')
         }) 
         it("Get id of a smart name with bad format", async() => {
-            await catchRevert(instance.getIdOfSmartName(toBytes(emptyName), toBytes(emptyExt)))
+            await catchRevert(instance.getIdOf(toBytes(emptyName), toBytes(emptyExt)))
         }) 
     })
 
