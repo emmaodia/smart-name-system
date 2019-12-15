@@ -1,11 +1,13 @@
 pragma solidity ^0.5.0;
 
+import "@openzeppelin/contracts/ownership/Secondary.sol";
+
 /**
  * @title SmartName
  * @author Steve Despres - @stevedespres - steve.despres@protonmail.com
  * @notice This contract represents a smart name. It is composed of an id, a name, an extension, an administrator and a record. It is owned by a it's creator, which is a registry. The administrator must use the registry contract to manage his smart name.
  */
-contract SmartName {
+contract SmartName is Secondary {
 
     /**
      * @notice Id
@@ -96,7 +98,7 @@ contract SmartName {
      * @param _administrator new administrator
      */
     function setAdministrator(address _administrator) public
-        addressNotEmpty(_administrator)
+        onlyPrimary() addressNotEmpty(_administrator)
     {
         administrator = _administrator;
         emit LogForAdministratorUpdate(id);
@@ -107,7 +109,7 @@ contract SmartName {
      * @param _record new administrator
      */
     function setRecord(address _record) public
-        addressNotEmpty(_record)
+        onlyPrimary() addressNotEmpty(_record)
     {
         record = _record;
         emit LogForRecordUpdate(id);
