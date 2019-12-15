@@ -1,5 +1,7 @@
 pragma solidity ^0.5.0;
 
+import "./SmartName.sol";
+
 /**
  * @title SmartNameRegistry
  * @author Steve Despres - @stevedespres - steve.despres@protonmail.com
@@ -21,23 +23,12 @@ contract SmartNameRegistry{
     /**
      * @notice Mapping of smart names ids and their index in wallet
      */
-    mapping (bytes32 => uint) private indexes;
+    mapping (bytes32 => uint) public indexes;
 
     /**
      * @notice Number of smart names registered
      */
-    uint nbSmartNamesTotal;
-
-     /**
-     * @notice Represents a smart name
-     */
-    struct SmartName {
-        bytes32 id;
-        bytes16 name;
-        bytes4 ext;
-        address administrator;
-        address record;
-    }
+    uint public nbSmartNamesTotal;
 
     /**
      * @notice Represents an Adminitrator of smart names
@@ -50,23 +41,31 @@ contract SmartNameRegistry{
 
     /**
      * @notice Log when a smart name is registered
+     * @param id id of the smart name
+     * @param smartName SmartName contract
      */
-    event LogForCreation(bytes32 id, bytes16 name, bytes4 ext, address administrator);
+    event LogForCreation(bytes32 id, SmartName smartName);
 
     /**
      * @notice Log when the administrator of a smart name is updated
+     * @param id id of the smart name
+     * @param smartName SmartName contract
      */
-    event LogForAdministratorUpdate(bytes32 id, bytes16 name, bytes4 ext,  address administrator);
+    event LogForAdministratorUpdate(bytes32 id, SmartName smartName);
 
     /**
-     * @notice Log when the record of a smart name is updates
+     * @notice Log when the record of a smart name is updated
+     * @param id id of the smart name
+     * @param smartName SmartName contract
      */
-    event LogForRecordUpdate(bytes32 id, bytes16 name, bytes4 ext, address record);
+    event LogForRecordUpdate(bytes32 id, SmartName smartName);
 
     /**
      * @notice Log when a smart name is abandoned
+     * @param id id of the smart name
+     * @param smartName SmartName contract
      */
-    event LogForAbandon(bytes32 id, bytes16 name, bytes4 ext);
+    event LogForAbandon(bytes32 id, SmartName smartName);
 
     /**
      * @notice Modifier to verify that the caller is the administrator of the smart name
@@ -74,7 +73,7 @@ contract SmartNameRegistry{
      */
     modifier isAdminOf(bytes32 _id)
     {
-        require(msg.sender == smartNames[_id].administrator, "Error: Only the administrator is authorized");
+        require(msg.sender == smartNames[_id].getAdministrator(), "Error: Only the administrator is authorized");
         _;
     }
 
@@ -94,7 +93,7 @@ contract SmartNameRegistry{
      */
     modifier isRegistered(bytes32 _id)
     {
-        require(smartNames[_id].administrator != address(0x0), "Error: The smart name is not registered");
+        require(smartNames[_id] != SmartName(0x0), "Error: The smart name is not registered");
         _;
     }
 
@@ -106,39 +105,7 @@ contract SmartNameRegistry{
     modifier isNotRegistered(bytes16 _name, bytes4 _ext)
     {
         bytes32 id = getIdOf(_name, _ext);
-        require(smartNames[id].administrator == address(0x0), "Error: The smart name is already registered");
-        _;
-    }
-
-    /**
-     * @notice Modifier to verify that the smart name is not registered
-     * @param _id id
-     */
-    modifier isId(bytes32 _id)
-    {
-        require(smartNames[_id].administrator != address(0x0), "Error: This is not an id of a smart name");
-        _;
-    }
-
-    /**
-     * @notice Modifier to verify that the name and the extension are not empty
-     * @param _name name
-     * @param _ext extension
-     */
-    modifier SmartNameNotEmpty(bytes16 _name, bytes4 _ext)
-    {
-            require(_name[0] != 0, "Error: The name is empty");
-            require(_ext[0] != 0, "Error: The extension is empty");
-        _;
-    }
-
-    /**
-     * @notice Modifier to verify that the address is not empty
-     * @param _address address
-     */
-    modifier addressNotEmpty(address _address)
-    {
-        require(_address != address(0x0), "Error: The address is empty");
+        require(smartNames[id] == SmartName(0x0), "Error: The smart name is already registered");
         _;
     }
 
@@ -146,14 +113,15 @@ contract SmartNameRegistry{
      * @notice Register a smart name
      * @param _name name
      * @param _ext extension
+     * @return Id and SmartName contract
      */
     function register(bytes16 _name, bytes4 _ext) public
-        isNotRegistered(_name, _ext) SmartNameNotEmpty(_name, _ext)
+        isNotRegistered(_name, _ext) returns(bytes32, SmartName)
     {
         bytes32 id = getIdOf(_name, _ext);
 
         // Create smart name
-        SmartName memory newSmartName = SmartName({id : id, name: _name, ext: _ext, administrator: msg.sender, record: msg.sender});
+        SmartName newSmartName = new SmartName(id, _name, _ext, msg.sender, msg.sender);
         smartNames[id] = newSmartName;
         nbSmartNamesTotal++;
 
@@ -165,7 +133,8 @@ contract SmartNameRegistry{
         // Update index in the wallet
         indexes[id] = administrators[msg.sender].nbSmartNames-1;
 
-        emit LogForCreation(id, _name, _ext, msg.sender);
+        emit LogForCreation(id, newSmartName);
+        return (id, newSmartName);
     }
 
     /**
@@ -175,8 +144,7 @@ contract SmartNameRegistry{
     function abandon(bytes32 _id) public
             isRegistered(_id) isAdminOf(_id)
     {
-        bytes16 name = smartNames[_id].name;
-        bytes4 ext = smartNames[_id].ext;
+        SmartName deletedSmartName = smartNames[_id];
 
         // Delete smart name
         delete smartNames[_id];
@@ -192,16 +160,17 @@ contract SmartNameRegistry{
         // Update index in the wallet
         delete indexes[_id];
 
-        emit LogForAbandon(_id, name, ext);
+        emit LogForAbandon(_id, deletedSmartName);
     }
 
    /**
      * @notice Modify the administrator of a smart name
      * @param _id id of the smart name
      * @param _newAdministrator new administrator
+     * @return Id and SmartName contract
      */
     function modifyAdministrator(bytes32 _id, address _newAdministrator) public
-        isRegistered(_id) isAdminOf(_id) addressNotEmpty(_newAdministrator)
+        isRegistered(_id) isAdminOf(_id) returns(bytes32, SmartName)
     {
         require(msg.sender != _newAdministrator, "Error : This address is already administrator of this smart name");
 
@@ -218,40 +187,50 @@ contract SmartNameRegistry{
         administrators[_newAdministrator].nbSmartNames++;
 
         // Update smart name
-        smartNames[_id].administrator = _newAdministrator;
-        smartNames[_id].record = _newAdministrator;
+        smartNames[_id].setAdministrator(_newAdministrator);
+        smartNames[_id].setRecord(_newAdministrator);
 
         // Update index in the wallet
         indexes[_id] = administrators[_newAdministrator].nbSmartNames-1;
 
-        emit LogForAdministratorUpdate(_id,  smartNames[_id].name,  smartNames[_id].ext, _newAdministrator);
+        emit LogForAdministratorUpdate(_id, smartNames[_id]);
+        return (_id, smartNames[_id]);
     }
 
     /**
      * @notice Modify the record of a smart name
      * @param _id id of the smart name
      * @param _newRecord new record
+     * @return SmartNameContract
      */
     function modifyRecord(bytes32 _id, address _newRecord) public
-        isRegistered(_id) isAdminOf(_id) addressNotEmpty(_newRecord)
+        isRegistered(_id) isAdminOf(_id) returns (bytes32, SmartName)
     {
-        require(smartNames[_id].record != _newRecord, "Error : This record is already associate to this smart name");
+        require(smartNames[_id].getRecord() != _newRecord, "Error : This record is already associate to this smart name");
 
         // Update record
-        smartNames[_id].record = _newRecord;
+        smartNames[_id].setRecord(_newRecord);
 
-        emit LogForRecordUpdate(_id,  smartNames[_id].name, smartNames[_id].ext, _newRecord);
+        emit LogForRecordUpdate(_id, smartNames[_id]);
+        return (_id, smartNames[_id]);
     }
 
     /**
      * @notice Get smart name by id
      * @param _id id of a smart name
-     * @return id, name, extension, administrator, record
+     * @return Id, SmartNameContract, name, extension, administrator, record
      */
     function getSmartName(bytes32 _id) public view
-        isId(_id) returns (bytes32, bytes16, bytes4, address, address)
+        isRegistered(_id) returns (bytes32, SmartName, bytes16, bytes4, address, address)
     {
-        return (_id, smartNames[_id].name, smartNames[_id].ext, smartNames[_id].administrator, smartNames[_id].record);
+        return (
+            _id,
+            smartNames[_id],
+            smartNames[_id].getName(),
+            smartNames[_id].getExtension(),
+            smartNames[_id].getAdministrator(),
+            smartNames[_id].getRecord()
+        );
     }
 
     /**
@@ -272,7 +251,7 @@ contract SmartNameRegistry{
     function getAdministratorOf(bytes32 _id) public view
         isRegistered(_id) returns (address, uint, bytes32[] memory)
     {
-        address adminAddress = smartNames[_id].administrator;
+        address adminAddress = smartNames[_id].getAdministrator();
         return getAdministratorByAddress(adminAddress);
     }
 
@@ -282,7 +261,7 @@ contract SmartNameRegistry{
      * @return address, number of smart names, wallet
      */
     function getAdministratorByAddress(address _address) public view
-        isAdmin(_address) addressNotEmpty(_address) returns (address, uint, bytes32[] memory)
+        isAdmin(_address) returns (address, uint, bytes32[] memory)
     {
         Administrator memory admin = administrators[_address];
         return(admin.addr, admin.nbSmartNames, admin.wallet);
@@ -295,7 +274,7 @@ contract SmartNameRegistry{
      * @return id
      */
     function getIdOf(bytes16 _name, bytes4 _ext) public pure
-        SmartNameNotEmpty(_name, _ext) returns (bytes32)
+        returns (bytes32)
     {
         return keccak256(abi.encodePacked(_name, _ext));
     }
