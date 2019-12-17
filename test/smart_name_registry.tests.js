@@ -21,11 +21,9 @@ contract('SmartNameRegistry', function(accounts) {
     const user = accounts[1]
  
     const record = accounts[3];
-    const emptyRecord = '0x0000000000000000000000000000000000000000'
     const emptyName = '';
     const emptyExt = '';
 
-    const emptyAddress = '0x0000000000000000000000000000000000000000'
     const emptyId = "0x0000000000000000000000000000000000000000000000000000000000000000"
 
     const name1 = 'name';
@@ -151,11 +149,6 @@ contract('SmartNameRegistry', function(accounts) {
             await catchRevert(smartNameRegistryInstance.modifyAdministrator(id1, user))
          })
 
-        it("Modify the administrator of a smart name with empty address", async() => {
-            await smartNameRegistryInstance.register(toBytes(name1), toBytes(ext1))
-            await catchRevert(smartNameRegistryInstance.modifyAdministrator(id1, emptyAddress))
-        })
-
         it("Modify the administrator of a smart name with the same administrator", async() => {
             await smartNameRegistryInstance.register(toBytes(name1), toBytes(ext1))
             await catchRevert(smartNameRegistryInstance.modifyAdministrator(id1, administrator))
@@ -183,11 +176,6 @@ contract('SmartNameRegistry', function(accounts) {
         it("Modify the administrator of a smart name which doesn't exist", async() => {
             await catchRevert(smartNameRegistryInstance.modifyRecord(id1, record))
          })
-
-        it("Modify the record of a smart name with empty address", async() => {
-            await smartNameRegistryInstance.register(toBytes(name1), toBytes(ext1))
-            await catchRevert(smartNameRegistryInstance.modifyAdministrator(id1, emptyRecord))
-        })
 
         it("Modify the record of a smart name with the same record", async() => {
             await smartNameRegistryInstance.register(toBytes(name1), toBytes(ext1))
@@ -279,10 +267,6 @@ contract('SmartNameRegistry', function(accounts) {
         it("Get administrator by address which not exist", async() => {
             await catchRevert(smartNameRegistryInstance.getAdministratorByAddress(user))
         })  
-
-        it("Get administrator with empty address", async() => {
-            await catchRevert(smartNameRegistryInstance.getAdministratorByAddress(emptyAddress))
-        })  
     })
 
     describe("GetSmartName()", async() => { 
@@ -342,15 +326,7 @@ contract('SmartNameRegistry', function(accounts) {
             await catchRevert(smartNameRegistryInstance.getSmartName(id1))
         }) 
     })
-
-    describe("GetIdOfSmartName()", async() => { 
-        
-        it("Get id of a smart name", async() => {
-            const result_id = await smartNameRegistryInstance.getIdOf(toBytes(name1), toBytes(ext1))
-            assert.equal(result_id, id1, 'The id of the smart name is not correct')
-        }) 
-    })
-
+    
     describe("GetNbSmartNamesTotal()", async() => { 
         
         it("Get number of smart names registered", async() => {

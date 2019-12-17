@@ -1,6 +1,7 @@
 pragma solidity ^0.5.0;
 
 import "./SmartName.sol";
+import "./SmartNameLibrary.sol";
 
 /**
  * @title SmartNameRegistry
@@ -94,6 +95,7 @@ contract SmartNameRegistry{
     modifier isRegistered(bytes32 _id)
     {
         require(smartNames[_id] != SmartName(0x0), "Error: The smart name is not registered");
+        require(smartNames[_id].getAdministrator() != address(0x0), "Error: The smart name is not registered");
         _;
     }
 
@@ -104,8 +106,10 @@ contract SmartNameRegistry{
      */
     modifier isNotRegistered(bytes16 _name, bytes4 _ext)
     {
-        bytes32 id = getIdOf(_name, _ext);
-        require(smartNames[id] == SmartName(0x0), "Error: The smart name is already registered");
+        bytes32 id = SmartNameLibrary.getIdOf(_name, _ext);
+        require((smartNames[id] == SmartName(0x0) || smartNames[id].getAdministrator() == address(0x0)),
+        "Error: The smart name is not registered");
+
         _;
     }
 
@@ -118,11 +122,10 @@ contract SmartNameRegistry{
     function register(bytes16 _name, bytes4 _ext) public
         isNotRegistered(_name, _ext) returns(bytes32, SmartName)
     {
-        bytes32 id = getIdOf(_name, _ext);
+        bytes32 id = SmartNameLibrary.getIdOf(_name, _ext);
 
         // Create smart name
-        SmartName newSmartName = new SmartName(id, _name, _ext, msg.sender, msg.sender);
-        smartNames[id] = newSmartName;
+        registerSmartName(id, _name, _ext);
         nbSmartNamesTotal++;
 
         // Update Administrator
@@ -133,8 +136,8 @@ contract SmartNameRegistry{
         // Update index in the wallet
         indexes[id] = administrators[msg.sender].nbSmartNames-1;
 
-        emit LogForCreation(id, newSmartName);
-        return (id, newSmartName);
+        emit LogForCreation(id, smartNames[id]);
+        return (id, smartNames[id]);
     }
 
     /**
@@ -144,10 +147,8 @@ contract SmartNameRegistry{
     function abandon(bytes32 _id) public
             isRegistered(_id) isAdminOf(_id)
     {
-        SmartName deletedSmartName = smartNames[_id];
-
         // Delete smart name
-        delete smartNames[_id];
+        abandonSmartName(smartNames[_id]);
         nbSmartNamesTotal--;
 
         // Update Administrator
@@ -160,7 +161,7 @@ contract SmartNameRegistry{
         // Update index in the wallet
         delete indexes[_id];
 
-        emit LogForAbandon(_id, deletedSmartName);
+        emit LogForAbandon(_id, smartNames[_id]);
     }
 
    /**
@@ -268,18 +269,6 @@ contract SmartNameRegistry{
     }
 
     /**
-     * @notice Get id of a smart name
-     * @param _name name
-     * @param _ext extension
-     * @return id
-     */
-    function getIdOf(bytes16 _name, bytes4 _ext) public pure
-        returns (bytes32)
-    {
-        return keccak256(abi.encodePacked(_name, _ext));
-    }
-
-    /**
      * @notice Get number of smart names
      * @return number of smart names
      */
@@ -287,5 +276,37 @@ contract SmartNameRegistry{
         returns (uint)
     {
         return nbSmartNamesTotal;
+    }
+
+    /**
+     * @notice Get id by name and extension
+     * @return id
+     */
+    function getIdOf(bytes16 _name, bytes4 _ext) public pure
+        returns (bytes32)
+    {
+        return SmartNameLibrary.getIdOf(_name, _ext);
+    }
+
+    /**
+     * @notice Reset the smart name. The contract is not deleted but the administrator and the record are reset to address(0x0)
+     */
+    function abandonSmartName(SmartName smartName) private
+    {
+        smartName.setAdministrator(address(0x0));
+        smartName.setRecord(address(0x0));
+    }
+
+    /**
+     * @notice Register the smart name. The administrator and the record of the smart name are set up.
+     */
+    function registerSmartName(bytes32 _id, bytes16 _name, bytes4 _ext) private
+    {
+        if(smartNames[_id] == SmartName(0x0)) {
+            smartNames[_id] = new SmartName(_id, _name, _ext, msg.sender, msg.sender);
+        } else {
+            smartNames[_id].setAdministrator(msg.sender);
+            smartNames[_id].setRecord(msg.sender);
+        }
     }
 }

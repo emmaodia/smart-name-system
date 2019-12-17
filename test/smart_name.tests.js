@@ -25,8 +25,6 @@ contract('SmartName', function(accounts) {
     const emptyName = '';
     const emptyExt = '';
 
-    const emptyAddress = '0x0000000000000000000000000000000000000000'
-
     const name1 = 'name';
     const ext1 = 'ext';
     const id1 = '0xac098044d08b519e4349f07a1c30d6e0b89cb69193face8a13eaee44fd8ceb31';
@@ -58,14 +56,6 @@ contract('SmartName', function(accounts) {
             await catchRevert(SmartName.new(id1, toBytes(name1), toBytes(emptyExt), administrator, record))
             await catchRevert(SmartName.new(id1, toBytes(emptyName), toBytes(emptyExt), administrator, record))
         })
-
-        it("Create several with bad administrator address", async() => {
-            await catchRevert(SmartName.new(id1, toBytes(name1), toBytes(ext1), emptyAddress, record))
-        })
-
-        it("Create several with bad record", async() => {
-            await catchRevert(SmartName.new(id1, toBytes(name1), toBytes(ext1), administrator, emptyAddress))
-        })
     })
 
     describe("Setters", async() => {
@@ -76,18 +66,10 @@ contract('SmartName', function(accounts) {
             assert.equal(result, user, 'The address of the administrator is not correct')
         })
 
-        it("SetAdministrator() with empty address", async() => {
-            await catchRevert(SmartName.new(id1, toBytes(name1), toBytes(ext1), emptyAddress, record))
-        })
-
         it("SetRecord", async() => {
             await smartNameInstance.setRecord(user)
             let result = await smartNameInstance.getRecord()
             assert.equal(result, user, 'The record is not correct')
-        })
-
-        it("SetAdministrator() with empty record", async() => {
-            await catchRevert(SmartName.new(id1, toBytes(name1), toBytes(ext1), administrator, emptyAddress))
         })
     })
 

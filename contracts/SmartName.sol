@@ -65,16 +65,6 @@ contract SmartName is Secondary {
     }
 
     /**
-     * @notice Modifier to verify that the address is not empty
-     * @param _address address
-     */
-    modifier addressNotEmpty(address _address)
-    {
-        require(_address != address(0x0), "Error: The address is empty");
-        _;
-    }
-
-    /**
      * @notice Constructor of a smart name
      * @param _id id
      * @param _name name
@@ -83,7 +73,7 @@ contract SmartName is Secondary {
      * @param _record record
      */
     constructor(bytes32 _id, bytes16 _name, bytes4 _ext, address _administrator, address _record) public
-        smartNameNotEmpty(_name, _ext) addressNotEmpty(_administrator) addressNotEmpty(_record)
+        smartNameNotEmpty(_name, _ext)
     {
         id = _id;
         name = _name;
@@ -98,7 +88,7 @@ contract SmartName is Secondary {
      * @param _administrator new administrator
      */
     function setAdministrator(address _administrator) public
-        onlyPrimary() addressNotEmpty(_administrator)
+        onlyPrimary()
     {
         administrator = _administrator;
         emit LogForAdministratorUpdate(id);
@@ -109,7 +99,7 @@ contract SmartName is Secondary {
      * @param _record new administrator
      */
     function setRecord(address _record) public
-        onlyPrimary() addressNotEmpty(_record)
+        onlyPrimary()
     {
         record = _record;
         emit LogForRecordUpdate(id);
