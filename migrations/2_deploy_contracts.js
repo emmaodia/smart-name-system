@@ -1,6 +1,6 @@
 var SmartNameLibrary = artifacts.require("./utils/SmartNameLibrary.sol");
 var SmartNameRegistry = artifacts.require("./registry/SmartNameRegistry.sol");
-var SmartNameResolver = artifacts.require("./services/SmartNameResolver.sol");
+var SmartNameResolver = artifacts.require("./services/resolver/SmartNameResolver.sol");
 
 module.exports = function(deployer) {
 

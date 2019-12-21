@@ -1,7 +1,7 @@
 pragma solidity ^0.5.0;
 
-import "../registry/SmartName.sol";
-import "./SmartNameService.sol";
+import "../../registry/SmartName.sol";
+import "../SmartNameService.sol";
 
 /**
  * @title SmartNameResolver

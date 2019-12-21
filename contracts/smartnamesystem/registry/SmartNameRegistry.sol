@@ -12,7 +12,7 @@ import "../utils/SmartNameLibrary.sol";
 contract SmartNameRegistry{
 
     /**
-     * @notice Mapping of address and SmartName
+     * @notice Mapping of id and SmartName
      */
     mapping (bytes32 => SmartName) public smartNames;
 
