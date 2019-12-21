@@ -1,7 +1,7 @@
 pragma solidity ^0.5.0;
 
 import "./SmartName.sol";
-import "./SmartNameLibrary.sol";
+import "../utils/SmartNameLibrary.sol";
 
 /**
  * @title SmartNameRegistry

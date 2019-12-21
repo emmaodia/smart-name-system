@@ -1,6 +1,6 @@
 pragma solidity ^0.5.0;
 
-import "./SmartNameRegistry.sol";
+import "../registry/SmartNameRegistry.sol";
 
 /**
  * @title SmartNameService
@@ -21,11 +21,11 @@ contract SmartNameService{
 
     /**
      * @notice Constructor of a Smart name service
-     * @param _smartNameRegistry SmartNameRegistry
+     * @param _smartNameRegistryAddress SmartNameRegistry address
      */
-    constructor(SmartNameRegistry _smartNameRegistry) internal
+    constructor(address _smartNameRegistryAddress) internal
     {
-        smartNameRegistry = _smartNameRegistry;
+        smartNameRegistry = SmartNameRegistry(_smartNameRegistryAddress);
         emit LogForServiceCreation();
     }
 }

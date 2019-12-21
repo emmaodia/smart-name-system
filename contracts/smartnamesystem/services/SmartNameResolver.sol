@@ -1,6 +1,6 @@
 pragma solidity ^0.5.0;
 
-import "./SmartName.sol";
+import "../registry/SmartName.sol";
 import "./SmartNameService.sol";
 
 /**
@@ -9,6 +9,13 @@ import "./SmartNameService.sol";
  * @notice This contract represents a resolver of smart name. It can be used to resolve smart names and get informations about
  */
 contract SmartNameResolver is SmartNameService {
+
+   /**
+     * @notice Constructor of a Smart name resolver
+     * @param _smartNameRegistryAddress SmartNameRegistry address
+     */
+    constructor(address _smartNameRegistryAddress) SmartNameService(_smartNameRegistryAddress) public
+    {}
 
      /**
      * @notice Resolve a smart name
