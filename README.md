@@ -1,1 +1,1 @@
-# smart-name-service
+# smart-name-system
