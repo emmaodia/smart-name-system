@@ -1,65 +1,50 @@
-/*
-
-
-This test file has been updated for Truffle version 5.0. If your tests are failing, make sure that you are
-using Truffle version 5.0. You can check this by running "truffle version"  in the terminal. If version 5 is not
-installed, you can uninstall the existing version with `npm uninstall -g truffle` and install the latest version (5.0)
-with `npm install -g truffle`.
-
-*/
+/* Tests for SmartNameMarket contract */
 
 let SmartNameRegistry = artifacts.require('SmartNameRegistry')
 let SmartNameMarket = artifacts.require('SmartNameMarket')
 
-let catchRevert = require("./exceptionsHelpers.js").catchRevert
-
-let toAscii = function(input) { return web3.utils.toAscii(input).replace(/\u0000/g, '') }
+let catchRevert = require("../../../exceptionsHelpers.js").catchRevert
 let toBytes = function(input) { return web3.utils.fromAscii(input) }
 
 contract('SmartName', function(accounts) {
 
     const administrator = accounts[0]
     const user1 = accounts[1]
- 
-    const record = accounts[3];
 
-    const unlocker = 'unlocker';
+    const unlocker = 'unlocker'
 
-    const emptyName = '';
-    const emptyExt = '';
+    const name1 = 'name'
+    const ext1 = 'ext'
+    const id1 = '0xac098044d08b519e4349f07a1c30d6e0b89cb69193face8a13eaee44fd8ceb31'
 
-    const name1 = 'name';
-    const ext1 = 'ext';
-    const id1 = '0xac098044d08b519e4349f07a1c30d6e0b89cb69193face8a13eaee44fd8ceb31';
+    const name2 = 'name2'
+    const ext2 = 'ext2'
+    const id2 = '0xb5060c27c60ff9b53a8c21bd133eccebbd2b1a61730bdb59f3d80763d0e415dd'
 
-    const name2 = 'name2';
-    const ext2 = 'ext2';
-    const id2 = '0xb5060c27c60ff9b53a8c21bd133eccebbd2b1a61730bdb59f3d80763d0e415dd';
+    const name3 = 'name3'
+    const ext3 = 'ext3'
+    const id3 = '0xdd4a9492a1f2f882f66e7bcc639f3a260a5481c8fb6ea5e8ea29a51568e63997'
 
-    const name3 = 'name3';
-    const ext3 = 'ext3';
-    const id3 = '0xdd4a9492a1f2f882f66e7bcc639f3a260a5481c8fb6ea5e8ea29a51568e63997';
-
-    const name4 = 'name4';
-    const ext4 = 'ext4';
-    const id4 = '0xee4a9492a1f2f882f66e7bcc639f3a260a5481c8fb6ea5e8ea29a51568e63765';
+    const name4 = 'name4'
+    const ext4 = 'ext4'
+    const id4 = '0xee4a9492a1f2f882f66e7bcc639f3a260a5481c8fb6ea5e8ea29a51568e63765'
     
     let smartNameMarketInstance
 
     beforeEach(async () => {
-
+        // Deploiement
         smartNameRegistryInstance = await SmartNameRegistry.new()
         smartNameMarketInstance = await SmartNameMarket.new(smartNameRegistryInstance.address)
-        
-        await smartNameRegistryInstance.register(toBytes(name1), toBytes(ext1))
-        await smartNameRegistryInstance.setUnlocker(id1, toBytes(unlocker));
 
-        await smartNameRegistryInstance.register(toBytes(name2), toBytes(ext2))
-        await smartNameRegistryInstance.modifyAdministrator(id2, user1)
-        await smartNameRegistryInstance.setUnlocker(id2, toBytes(unlocker), {from: user1});
+        //Register and unlock smart names
+        await smartNameRegistryInstance.register(toBytes(name1), toBytes(ext1))
+        await smartNameRegistryInstance.setUnlocker(id1, toBytes(unlocker))
+
+        await smartNameRegistryInstance.register(toBytes(name2), toBytes(ext2), {from: user1})
+        await smartNameRegistryInstance.setUnlocker(id2, toBytes(unlocker), {from: user1})
 
         await smartNameRegistryInstance.register(toBytes(name3), toBytes(ext3))
-        await smartNameRegistryInstance.setUnlocker(id3, toBytes(unlocker));
+        await smartNameRegistryInstance.setUnlocker(id3, toBytes(unlocker))
     })
 
     describe("Sell()", async() => {
@@ -77,7 +62,7 @@ contract('SmartName', function(accounts) {
         })  
 
         it("Sell a smart name which is not unlocked", async() => {
-            await smartNameRegistryInstance.removeUnlocker(id1);
+            await smartNameRegistryInstance.removeUnlocker(id1)
             await catchRevert(smartNameMarketInstance.sell(id1, 2, toBytes(unlocker)))
         })  
 
@@ -85,13 +70,11 @@ contract('SmartName', function(accounts) {
             await smartNameMarketInstance.sell(id1, 2, toBytes(unlocker))
             await catchRevert(smartNameMarketInstance.sell(id1, 2, toBytes(unlocker)))
         })  
-
     })
 
     describe("CancelSale()", async() => {
 
         it("Cancel sale of a smart name", async() => {
-     
             await smartNameMarketInstance.sell(id1, 2, toBytes(unlocker))
             await smartNameMarketInstance.cancelSale(id1)
         })
@@ -102,8 +85,8 @@ contract('SmartName', function(accounts) {
         
         it("Cancel sale of a smart name which is not administrated by the caller", async() => {
             await smartNameRegistryInstance.modifyAdministrator(id1, user1)
-            await smartNameRegistryInstance.setUnlocker(id1, toBytes(unlocker), {from: user1});
-            await smartNameMarketInstance.sell(id1, 2, toBytes(unlocker), {from: user1});
+            await smartNameRegistryInstance.setUnlocker(id1, toBytes(unlocker), {from: user1})
+            await smartNameMarketInstance.sell(id1, 2, toBytes(unlocker), {from: user1})
 
             await catchRevert(smartNameMarketInstance.cancelSale(id1))
         })  
@@ -123,15 +106,12 @@ contract('SmartName', function(accounts) {
     describe("Buy()", async() => {
 
         it("Buy a smart name", async() => {
-
             await smartNameMarketInstance.sell(id1, 2, toBytes(unlocker))
-
             await smartNameMarketInstance.buy(id1, {from: user1, value: 2})
 
             await catchRevert(smartNameMarketInstance.getItem(id1))
 
             const result_getSmartName = await smartNameRegistryInstance.getSmartName(id1)
-
             const result_administrator_addr = result_getSmartName[4]
             const result_record = result_getSmartName[5]
 
@@ -140,8 +120,6 @@ contract('SmartName', function(accounts) {
         })
 
         it("Buy a smart name which is not unlocked", async() => {
-
-
             await smartNameMarketInstance.sell(id1, 2, toBytes(unlocker))
             await smartNameRegistryInstance.removeUnlocker(id1)
     
@@ -149,16 +127,13 @@ contract('SmartName', function(accounts) {
         })
 
         it("Buy a smart name with not enough money", async() => {
-
-    
             await smartNameMarketInstance.sell(id1, 2, toBytes(unlocker))
-   
+
             await catchRevert(smartNameMarketInstance.buy(id1, {from: user1, value: 1}))
         })
 
 
         it("Buy a smart name which is already owned", async() => {
-
             await smartNameMarketInstance.sell(id1, 2, toBytes(unlocker))
    
             await catchRevert(smartNameMarketInstance.buy(id1, {value: 2}))
@@ -169,15 +144,11 @@ contract('SmartName', function(accounts) {
         })
 
         it("Buy a smart name which is already sell", async() => {
-
-   
             await smartNameMarketInstance.sell(id1, 2, toBytes(unlocker))
-
             await smartNameMarketInstance.buy(id1, {from: user1, value: 2})
    
             await catchRevert(smartNameMarketInstance.buy(id1, {value: 2}))
         })
-
     })
 
     describe("ModifyPrice()", async() => {
@@ -185,8 +156,10 @@ contract('SmartName', function(accounts) {
         it("Modify the price of a smart name", async() => {
             await smartNameMarketInstance.sell(id1, 2, toBytes(unlocker))
             await smartNameMarketInstance.modifyPrice(id1, 5)
+            
             const result_item = await smartNameMarketInstance.getItem(id1)
             const result_price = result_item[1]
+            
             assert.equal(result_price, 5, 'The price of the smart name is not correct')
         })
 
@@ -209,8 +182,7 @@ contract('SmartName', function(accounts) {
 
             await smartNameMarketInstance.buy(id2, {value: 2})
 
-            assert.equal(await smartNameMarketInstance.getNbItemsTotal(), 0, 'The number of the smart name to sale is not correct')
-                    
+            assert.equal(await smartNameMarketInstance.getNbItemsTotal(), 0, 'The number of the smart name to sale is not correct')            
         })
     })
 
@@ -262,5 +234,4 @@ contract('SmartName', function(accounts) {
             await catchRevert(smartNameMarketInstance.getItem(id3))
         })
     })
-
 })

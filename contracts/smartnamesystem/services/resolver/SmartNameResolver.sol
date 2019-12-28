@@ -6,7 +6,7 @@ import "../SmartNameService.sol";
 /**
  * @title SmartNameResolver
  * @author Steve Despres - @stevedespres - steve.despres@protonmail.com
- * @notice This contract represents a resolver of smart name. It can be used to resolve smart names and get informations about
+ * @notice This contract represents a resolver of smart name. It can be used to resolve smart names and get informations about it
  */
 contract SmartNameResolver is SmartNameService {
 
@@ -27,7 +27,7 @@ contract SmartNameResolver is SmartNameService {
         returns (address)
     {
         bytes32 id = smartNameRegistry.getIdOf(_name, _ext);
-        (, , , , ,address record) = smartNameRegistry.getSmartName(id);
+        (,,,,, address record) = smartNameRegistry.getSmartName(id);
         return record;
     }
 

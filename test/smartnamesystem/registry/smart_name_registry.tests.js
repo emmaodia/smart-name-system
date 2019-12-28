@@ -1,16 +1,8 @@
-/*
-
-
-This test file has been updated for Truffle version 5.0. If your tests are failing, make sure that you are
-using Truffle version 5.0. You can check this by running "truffle version"  in the terminal. If version 5 is not
-installed, you can uninstall the existing version with `npm uninstall -g truffle` and install the latest version (5.0)
-with `npm install -g truffle`.
-
-*/
+/* Tests for SmartNameRegistry contract */
 
 let SmartNameRegistry = artifacts.require('SmartNameRegistry')
 
-let catchRevert = require("./exceptionsHelpers.js").catchRevert
+let catchRevert = require("../../exceptionsHelpers.js").catchRevert
 
 let toAscii = function(input) { return web3.utils.toAscii(input).replace(/\u0000/g, '') }
 let toBytes = function(input) { return web3.utils.fromAscii(input) }
@@ -20,27 +12,28 @@ contract('SmartNameRegistry', function(accounts) {
     const administrator = accounts[0]
     const user = accounts[1]
  
-    const record = accounts[3];
-    const emptyName = '';
-    const emptyExt = '';
+    const record = accounts[3]
+    const emptyName = ''
+    const emptyExt = ''
 
     const emptyId = "0x0000000000000000000000000000000000000000000000000000000000000000"
 
-    const name1 = 'name';
-    const ext1 = 'ext';
-    const id1 = '0xac098044d08b519e4349f07a1c30d6e0b89cb69193face8a13eaee44fd8ceb31';
+    const name1 = 'name'
+    const ext1 = 'ext'
+    const id1 = '0xac098044d08b519e4349f07a1c30d6e0b89cb69193face8a13eaee44fd8ceb31'
 
-    const name2 = 'name2';
-    const ext2 = 'ext2';
-    const id2 = '0xb5060c27c60ff9b53a8c21bd133eccebbd2b1a61730bdb59f3d80763d0e415dd';
+    const name2 = 'name2'
+    const ext2 = 'ext2'
+    const id2 = '0xb5060c27c60ff9b53a8c21bd133eccebbd2b1a61730bdb59f3d80763d0e415dd'
     
-    const name3 = 'name3';
-    const ext3 = 'ext3';
-    const id3 = '0xdd4a9492a1f2f882f66e7bcc639f3a260a5481c8fb6ea5e8ea29a51568e63997';
+    const name3 = 'name3'
+    const ext3 = 'ext3'
+    const id3 = '0xdd4a9492a1f2f882f66e7bcc639f3a260a5481c8fb6ea5e8ea29a51568e63997'
 
     let smartNameRegistryInstance
 
     beforeEach(async () => {
+        // Deploiement
         smartNameRegistryInstance = await SmartNameRegistry.new()
     })
 
@@ -67,7 +60,6 @@ contract('SmartNameRegistry', function(accounts) {
             await smartNameRegistryInstance.register(toBytes(name1), toBytes(ext1))
             await catchRevert(smartNameRegistryInstance.register(toBytes(name1), toBytes(ext1)))
         })
-
     })
 
     describe("Abandon()", async() => { 
@@ -108,6 +100,7 @@ contract('SmartNameRegistry', function(accounts) {
         it("Abandon a smart name if the caller is not the administrator", async() => {
             await smartNameRegistryInstance.register(toBytes(name1), toBytes(ext1))
             await smartNameRegistryInstance.modifyAdministrator(id1, user)
+
             await catchRevert(smartNameRegistryInstance.abandon(id1))
          })
 
@@ -120,10 +113,10 @@ contract('SmartNameRegistry', function(accounts) {
         it("Abandon a smart name with bad unlocker", async() => {
             await smartNameRegistryInstance.register(toBytes(name1), toBytes(ext1))
             await smartNameRegistryInstance.setUnlocker(id1, toBytes("unlocker"))
+
             await catchRevert(smartNameRegistryInstance.abandonWithUnlocker(id1, toBytes("badunlocker")))
         })
     })
-
 
     describe("ModifyAdministrator()", async() => { 
 
@@ -155,7 +148,6 @@ contract('SmartNameRegistry', function(accounts) {
             assert.equal(result_oldAddress, administrator, 'The address of the old administrator is not correct')
             assert.equal(result_oldNbSmartName, 1, 'The number of smart names of the old administrator is not correct')
             assert.equal(result_oldWallet[0], emptyId, 'The smart name of the old administrator not abandon')
-
          })
 
          it("Modify the administrator of a smart name with another account", async() => {
@@ -169,24 +161,28 @@ contract('SmartNameRegistry', function(accounts) {
 
         it("Modify the administrator of a smart name with the same administrator", async() => {
             await smartNameRegistryInstance.register(toBytes(name1), toBytes(ext1))
+            
             await catchRevert(smartNameRegistryInstance.modifyAdministrator(id1, administrator))
         })
 
         it("Modify the administrator if the caller is not the administrator of the smart name", async() => {
             await smartNameRegistryInstance.register(toBytes(name1), toBytes(ext1))
             await smartNameRegistryInstance.modifyAdministrator(id1, user)
+            
             await catchRevert(smartNameRegistryInstance.modifyAdministrator(id1, administrator))
         })
 
         it("Modify the administrator with unlocker", async() => {
             await smartNameRegistryInstance.register(toBytes(name1), toBytes(ext1))
             await smartNameRegistryInstance.setUnlocker(id1, toBytes("unlocker"))
+            
             await smartNameRegistryInstance.modifyAdministratorWithUnlocker(id1, user, toBytes("unlocker"))
         })
 
         it("Modify the administrator with bad unlocker", async() => {
             await smartNameRegistryInstance.register(toBytes(name1), toBytes(ext1))
             await smartNameRegistryInstance.setUnlocker(id1, toBytes("unlocker"))
+            
             await catchRevert(smartNameRegistryInstance.modifyAdministratorWithUnlocker(id1, user, toBytes("badunlocker")))
         })
     })
@@ -198,6 +194,7 @@ contract('SmartNameRegistry', function(accounts) {
             await smartNameRegistryInstance.modifyRecord(id1, record)
 
             const result_smartname = await smartNameRegistryInstance.getSmartName(id1)
+            
             const result_record = result_smartname[5]
             assert.equal(result_record, record, 'The record of the smart name is not correct')
          })
@@ -212,6 +209,7 @@ contract('SmartNameRegistry', function(accounts) {
          })
 
         it("Modify the record of a smart name with the same record", async() => {
+            
             await smartNameRegistryInstance.register(toBytes(name1), toBytes(ext1))
             await catchRevert(smartNameRegistryInstance.modifyAdministrator(id1, administrator))
         })
@@ -219,6 +217,7 @@ contract('SmartNameRegistry', function(accounts) {
         it("Modify the record if the caller is not the administrator of the smart name", async() => {
             await smartNameRegistryInstance.register(toBytes(name1), toBytes(ext1))
             await smartNameRegistryInstance.modifyAdministrator(id1, user)
+            
             await catchRevert(smartNameRegistryInstance.modifyAdministrator(id1, record))
         })
 
@@ -231,9 +230,9 @@ contract('SmartNameRegistry', function(accounts) {
         it("Modify the record with bad unlocker", async() => {
             await smartNameRegistryInstance.register(toBytes(name1), toBytes(ext1))
             await smartNameRegistryInstance.setUnlocker(id1, toBytes("unlocker"))
+            
             await catchRevert(smartNameRegistryInstance.modifyAdministratorWithUnlocker(id1, record, toBytes("badunlocker")))
         })
-
     })
 
     describe("GetAdministrator()", async() => { 
@@ -287,7 +286,7 @@ contract('SmartNameRegistry', function(accounts) {
                 assert.equal(result_address, administrator, 'The address of the administrator is not correct')
                 assert.equal(result_nbSmartName, 3, 'The number of smart names is not correct')
                 assert.equal(result_wallet[idx], id, 'The id of smart name is not correct')
-                idx++;
+                idx++
             }) 
         })
 
@@ -319,6 +318,7 @@ contract('SmartNameRegistry', function(accounts) {
 
         it("Get smart name", async() => {
             await smartNameRegistryInstance.register(toBytes(name1), toBytes(ext1))
+            
             const result_getSmartName = await smartNameRegistryInstance.getSmartName(id1)
 
             const result_id = result_getSmartName[0]
@@ -376,17 +376,16 @@ contract('SmartNameRegistry', function(accounts) {
     describe("GetNbSmartNamesTotal()", async() => { 
         
         it("Get number of smart names registered", async() => {
-         
             const nbSmartNames_before = await smartNameRegistryInstance.getNbSmartNamesTotal()
+            
             await smartNameRegistryInstance.register(toBytes(name1), toBytes(ext1))
             await smartNameRegistryInstance.register(toBytes(name2), toBytes(ext2))
             await smartNameRegistryInstance.register(toBytes(name3), toBytes(ext3))
+            
             const nbSmartNames_after = await smartNameRegistryInstance.getNbSmartNamesTotal()
 
             assert.equal(nbSmartNames_before, 0, 'The number of smart names is not correct')
             assert.equal(nbSmartNames_after, 3, 'The number of smart names is not correct')
         }) 
     })
-
-
 })

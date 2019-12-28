@@ -1,6 +1,5 @@
 pragma solidity ^0.5.0;
 
-import "../../registry/SmartName.sol";
 import "../SmartNameService.sol";
 
 import "@openzeppelin/contracts/payment/PullPayment.sol";
@@ -12,14 +11,21 @@ import "@openzeppelin/contracts/payment/PullPayment.sol";
  */
 contract SmartNameBanking is SmartNameService, PullPayment {
 
-   /**
+    /**
+     * @notice Log when ether is send to smart name
+     * @param id id of the smart name
+     * @param amount amount of ether sent
+     */
+    event LogForSendToSmartName(bytes32 id, uint amount);
+
+    /**
      * @notice Constructor of a Smart name banking
      * @param _smartNameRegistryAddress SmartNameRegistry address
      */
     constructor(address _smartNameRegistryAddress) SmartNameService(_smartNameRegistryAddress) public
     {}
 
-     /**
+    /**
      * @notice Send ether to a smart name
      * @param _name name
      * @param _ext extension
@@ -38,5 +44,6 @@ contract SmartNameBanking is SmartNameService, PullPayment {
     {
         (, , , , ,address record) = smartNameRegistry.getSmartName(_id);
         _asyncTransfer(record, msg.value);
+        emit LogForSendToSmartName(_id, msg.value);
     }
 }

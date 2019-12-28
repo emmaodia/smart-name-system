@@ -9,7 +9,7 @@ import "@openzeppelin/contracts/payment/PullPayment.sol";
 /**
  * @title SmartNameMarket
  * @author Steve Despres - @stevedespres - steve.despres@protonmail.com
- * @notice This contract represents a market of smart name. Users can put on sale and buy smart names registered on a SmartNameRegistry.
+ * @notice This contract represents a market of smart name. Users can put on sale and buy smart names registered on a SmartNameRegistry
  */
 contract SmartNameMarket is SmartNameService, PullPayment{
 
@@ -24,7 +24,7 @@ contract SmartNameMarket is SmartNameService, PullPayment{
     mapping (address => Seller) public sellers;
 
     /**
-     * @notice Mapping of ids and their index
+     * @notice Mapping of smart names ids and their index
      */
     mapping (bytes32 => uint) public indexes;
 
@@ -43,7 +43,7 @@ contract SmartNameMarket is SmartNameService, PullPayment{
     }
 
     /**
-     * @notice Represents an Item : smart name and its price
+     * @notice Represents an Item : smart name, its price and its unlocker
      */
     struct Item {
         SmartName smartName;

@@ -73,8 +73,6 @@ contract SmartNameRegistry{
      */
     event LogForAbandonByRegistry(bytes32 id, SmartName smartName);
 
-    event LogAddress(address addr);
-
     /**
      * @notice Modifier to verify that the caller is the administrator of the smart name
      * @param _id id of the smart name
@@ -86,7 +84,7 @@ contract SmartNameRegistry{
     }
 
     /**
-     * @notice Modifier to verify that the caller is the administrator of the smart name
+     * @notice Modifier to verify the unlocker of the smart name
      * @param _id id of the smart name
      * @param _unlocker id of the smart name
      */
@@ -95,7 +93,6 @@ contract SmartNameRegistry{
         require(isUnlocker(_id, _unlocker), "Error: The unlocker for this smart name is not correct");
         _;
     }
-
 
     /**
      * @notice Modifier to verify that the adress is an administrator
@@ -197,7 +194,7 @@ contract SmartNameRegistry{
         // Update Administrator
         administrators[administrator].nbSmartNames--;
         delete administrators[administrator].wallet[indexes[_id]];
-        if(administrators[administrator].nbSmartNames==0) {
+        if(administrators[administrator].nbSmartNames == 0) {
             delete administrators[administrator];
         }
 
@@ -423,7 +420,7 @@ contract SmartNameRegistry{
     }
 
     /**
-     * @notice Reset the smart name. The contract is not deleted but the administrator and the record are reset to address(0x0)
+     * @notice Abandon the smart name. The contract is not deleted but the administrator and the record are reset to address(0x0)
      * @param smartName SmartName contract
      */
     function abandonSmartName(SmartName smartName) private
@@ -447,5 +444,4 @@ contract SmartNameRegistry{
             smartNames[_id].setRecord(msg.sender);
         }
     }
-
 }

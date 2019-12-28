@@ -5,7 +5,7 @@ import "@openzeppelin/contracts/ownership/Secondary.sol";
 /**
  * @title SmartName
  * @author Steve Despres - @stevedespres - steve.despres@protonmail.com
- * @notice This contract represents a smart name. It is composed of an id, a name, an extension, an administrator and a record. It is owned by a it's creator, which is a registry. The administrator must use the registry contract to manage his smart name.
+ * @notice This contract represents a smart name. It is composed of an id (bytes32), a name (bytes16), an extension (bytes4), an administrator (address) and a record (address). It is owned by a it's creator, which is a registry. The administrator must use the registry contract to manage his smart name.
  */
 contract SmartName is Secondary {
 
