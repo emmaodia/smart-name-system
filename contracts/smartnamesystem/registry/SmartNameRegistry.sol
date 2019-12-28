@@ -27,6 +27,11 @@ contract SmartNameRegistry{
     mapping (bytes32 => uint) public indexes;
 
     /**
+     * @notice Mapping of smart names ids and their unlockers
+     */
+    mapping (bytes32 => bytes32) private unlockers;
+
+    /**
      * @notice Number of smart names registered
      */
     uint public nbSmartNamesTotal;
@@ -45,28 +50,30 @@ contract SmartNameRegistry{
      * @param id id of the smart name
      * @param smartName SmartName contract
      */
-    event LogForCreation(bytes32 id, SmartName smartName);
+    event LogForRegisterByRegistry(bytes32 id, SmartName smartName);
 
     /**
      * @notice Log when the administrator of a smart name is updated
      * @param id id of the smart name
      * @param smartName SmartName contract
      */
-    event LogForAdministratorUpdate(bytes32 id, SmartName smartName);
+    event LogForAdministratorUpdateByRegistry(bytes32 id, SmartName smartName);
 
     /**
      * @notice Log when the record of a smart name is updated
      * @param id id of the smart name
      * @param smartName SmartName contract
      */
-    event LogForRecordUpdate(bytes32 id, SmartName smartName);
+    event LogForRecordUpdateByRegistry(bytes32 id, SmartName smartName);
 
     /**
      * @notice Log when a smart name is abandoned
      * @param id id of the smart name
      * @param smartName SmartName contract
      */
-    event LogForAbandon(bytes32 id, SmartName smartName);
+    event LogForAbandonByRegistry(bytes32 id, SmartName smartName);
+
+    event LogAddress(address addr);
 
     /**
      * @notice Modifier to verify that the caller is the administrator of the smart name
@@ -77,6 +84,18 @@ contract SmartNameRegistry{
         require(msg.sender == smartNames[_id].getAdministrator(), "Error: Only the administrator is authorized");
         _;
     }
+
+    /**
+     * @notice Modifier to verify that the caller is the administrator of the smart name
+     * @param _id id of the smart name
+     * @param _unlocker id of the smart name
+     */
+    modifier isUnlockerOf(bytes32 _id, bytes32 _unlocker)
+    {
+        require(isUnlocker(_id, _unlocker), "Error: The unlocker for this smart name is not correct");
+        _;
+    }
+
 
     /**
      * @notice Modifier to verify that the adress is an administrator
@@ -136,32 +155,84 @@ contract SmartNameRegistry{
         // Update index in the wallet
         indexes[id] = administrators[msg.sender].nbSmartNames-1;
 
-        emit LogForCreation(id, smartNames[id]);
+        emit LogForRegisterByRegistry(id, smartNames[id]);
         return (id, smartNames[id]);
     }
+
 
     /**
      * @notice Abandon a smart name
      * @param _id id of the smart name
      */
     function abandon(bytes32 _id) public
-            isRegistered(_id) isAdminOf(_id)
+        isAdminOf(_id)
     {
+        return abandonSmartName(_id);
+    }
+
+    /**
+     * @notice Abandon a smart name with Unlocker
+     * @param _id id of the smart name
+     * @param _unlocker unlocker of the smart name
+     */
+    function abandonWithUnlocker(bytes32 _id, bytes32 _unlocker) public
+        isUnlockerOf(_id, _unlocker)
+    {
+        return abandonSmartName(_id);
+    }
+
+    /**
+     * @notice Abandon a smart name
+     * @param _id id of the smart name
+     */
+    function abandonSmartName(bytes32 _id) private
+        isRegistered(_id)
+    {
+        address administrator = smartNames[_id].getAdministrator();
+
         // Delete smart name
         abandonSmartName(smartNames[_id]);
         nbSmartNamesTotal--;
 
         // Update Administrator
-        administrators[msg.sender].nbSmartNames--;
-        delete administrators[msg.sender].wallet[indexes[_id]];
-        if(administrators[msg.sender].nbSmartNames==0) {
-            delete administrators[msg.sender];
+        administrators[administrator].nbSmartNames--;
+        delete administrators[administrator].wallet[indexes[_id]];
+        if(administrators[administrator].nbSmartNames==0) {
+            delete administrators[administrator];
         }
 
         // Update index in the wallet
         delete indexes[_id];
 
-        emit LogForAbandon(_id, smartNames[_id]);
+        // Delete unlocker
+        delete unlockers[_id];
+
+        emit LogForAbandonByRegistry(_id, smartNames[_id]);
+    }
+
+    /**
+     * @notice Modifiy the administrator of a smart name
+     * @param _id id of the smart name
+     * @param _newAdministrator new administrator
+     * @return Id and SmartName contract
+     */
+    function modifyAdministrator(bytes32 _id, address _newAdministrator) public
+        isAdminOf(_id) returns(bytes32, SmartName)
+    {
+        return modifyAdministratorOfSmartName(_id, _newAdministrator);
+    }
+
+    /**
+     * @notice Modifiy the administrator of a smart name with Unlocker
+     * @param _id id of the smart name
+     * @param _newAdministrator new administrator
+     * @param _unlocker unlocker of the smart name
+     * @return Id and SmartName contract
+     */
+    function modifyAdministratorWithUnlocker(bytes32 _id, address _newAdministrator, bytes32 _unlocker) public
+        isUnlockerOf(_id, _unlocker) returns(bytes32, SmartName)
+    {
+        return modifyAdministratorOfSmartName(_id, _newAdministrator);
     }
 
    /**
@@ -170,16 +241,17 @@ contract SmartNameRegistry{
      * @param _newAdministrator new administrator
      * @return Id and SmartName contract
      */
-    function modifyAdministrator(bytes32 _id, address _newAdministrator) public
-        isRegistered(_id) isAdminOf(_id) returns(bytes32, SmartName)
+    function modifyAdministratorOfSmartName(bytes32 _id, address _newAdministrator) private
+        isRegistered(_id) returns(bytes32, SmartName)
     {
-        require(msg.sender != _newAdministrator, "Error : This address is already administrator of this smart name");
+        address oldAdministrator = smartNames[_id].getAdministrator();
+        require(oldAdministrator != _newAdministrator, "Error : This address is already administrator of this smart name");
 
         // Update old administrator
-        administrators[msg.sender].nbSmartNames--;
-        delete administrators[msg.sender].wallet[indexes[_id]];
-        if(administrators[msg.sender].nbSmartNames==0){
-            delete administrators[msg.sender];
+        administrators[oldAdministrator].nbSmartNames--;
+        delete administrators[oldAdministrator].wallet[indexes[_id]];
+        if(administrators[oldAdministrator].nbSmartNames==0){
+            delete administrators[oldAdministrator];
         }
 
         // Update new Administrator
@@ -194,7 +266,10 @@ contract SmartNameRegistry{
         // Update index in the wallet
         indexes[_id] = administrators[_newAdministrator].nbSmartNames-1;
 
-        emit LogForAdministratorUpdate(_id, smartNames[_id]);
+        // Delete unlocker
+        delete unlockers[_id];
+
+        emit LogForAdministratorUpdateByRegistry(_id, smartNames[_id]);
         return (_id, smartNames[_id]);
     }
 
@@ -205,15 +280,72 @@ contract SmartNameRegistry{
      * @return SmartNameContract
      */
     function modifyRecord(bytes32 _id, address _newRecord) public
-        isRegistered(_id) isAdminOf(_id) returns (bytes32, SmartName)
+        isAdminOf(_id) returns (bytes32, SmartName)
+    {
+        return modifyRecordOfSmartName(_id, _newRecord);
+    }
+
+    /**
+     * @notice Modify the record of a smart name with unlocker
+     * @param _id id of the smart name
+     * @param _newRecord new record
+     * @param _unlocker unlocker of the smart name
+     * @return SmartNameContract
+     */
+    function modifyRecordWithUnlocker(bytes32 _id, address _newRecord, bytes32 _unlocker) public
+        isUnlockerOf(_id, _unlocker) returns (bytes32, SmartName)
+    {
+        return modifyRecordOfSmartName(_id, _newRecord);
+    }
+
+    /**
+     * @notice Modify the record of a smart name
+     * @param _id id of the smart name
+     * @param _newRecord new record
+     * @return SmartNameContract
+     */
+    function modifyRecordOfSmartName(bytes32 _id, address _newRecord) private
+        isRegistered(_id) returns (bytes32, SmartName)
     {
         require(smartNames[_id].getRecord() != _newRecord, "Error : This record is already associate to this smart name");
 
         // Update record
         smartNames[_id].setRecord(_newRecord);
 
-        emit LogForRecordUpdate(_id, smartNames[_id]);
+        emit LogForRecordUpdateByRegistry(_id, smartNames[_id]);
         return (_id, smartNames[_id]);
+    }
+
+    /**
+     * @notice Set an unlocker for a smart name. An unlocker is a code that permit to manage a domain name not being the administrator.
+     * @param _id id of the smart name
+     * @param _unlocker unlocker of the smart name
+     */
+    function setUnlocker(bytes32 _id, bytes32 _unlocker) public
+        isAdminOf(_id)
+    {
+        unlockers[_id] = keccak256(abi.encodePacked(_unlocker));
+    }
+
+    /**
+     * @notice Remove the unlocker of a smart name
+     * @param _id id of the smart name
+     */
+    function removeUnlocker(bytes32 _id) public
+        isAdminOf(_id)
+    {
+        delete unlockers[_id];
+    }
+
+    /**
+     * @notice Register the smart name. The administrator and the record of the smart name are set up.
+     * @param _id id
+     * @param _unlocker unlocker
+     */
+    function isUnlocker(bytes32 _id, bytes32 _unlocker) public view
+        returns (bool)
+    {
+        return (keccak256(abi.encodePacked(_unlocker)) == unlockers[_id]) && (unlockers[_id] != bytes32(0x0));
     }
 
     /**
@@ -280,6 +412,8 @@ contract SmartNameRegistry{
 
     /**
      * @notice Get id by name and extension
+     * @param _name name
+     * @param _ext extension
      * @return id
      */
     function getIdOf(bytes16 _name, bytes4 _ext) public pure
@@ -290,6 +424,7 @@ contract SmartNameRegistry{
 
     /**
      * @notice Reset the smart name. The contract is not deleted but the administrator and the record are reset to address(0x0)
+     * @param smartName SmartName contract
      */
     function abandonSmartName(SmartName smartName) private
     {
@@ -299,6 +434,9 @@ contract SmartNameRegistry{
 
     /**
      * @notice Register the smart name. The administrator and the record of the smart name are set up.
+     * @param _id id
+     * @param _name name
+     * @param _ext extension
      */
     function registerSmartName(bytes32 _id, bytes16 _name, bytes4 _ext) private
     {
@@ -309,4 +447,5 @@ contract SmartNameRegistry{
             smartNames[_id].setRecord(msg.sender);
         }
     }
+
 }

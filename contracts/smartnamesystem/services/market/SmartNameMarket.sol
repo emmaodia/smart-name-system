@@ -48,6 +48,7 @@ contract SmartNameMarket is SmartNameService, PullPayment{
     struct Item {
         SmartName smartName;
         uint price;
+        bytes32 unlocker;
     }
 
     /**
@@ -55,7 +56,7 @@ contract SmartNameMarket is SmartNameService, PullPayment{
      * @param id id of the smartName
      * @param price price
      */
-    event LogForCreation(bytes32 id, uint price);
+    event LogForPutOnSaleOnMarket(bytes32 id, uint price);
 
     /**
      * @notice Log when a smart name is sale
@@ -63,20 +64,20 @@ contract SmartNameMarket is SmartNameService, PullPayment{
      * @param price price
      * @param buyer buyer
      */
-    event LogForSale(bytes32 id, uint price, address buyer);
+    event LogForSaleOnMarket(bytes32 id, uint price, address buyer);
 
     /**
      * @notice Log when the price of a smart name is updated
      * @param id id of the smart name
      * @param price price
      */
-    event LogForPriceUpdate(bytes32 id, uint price);
+    event LogForPriceUpdateOnMarket(bytes32 id, uint price);
 
     /**
      * @notice Log when a smart name sale is canceled
      * @param id id of the smart name
      */
-    event LogForCancelSale(bytes32 id);
+    event LogForCancelSaleOnMarket(bytes32 id);
 
     /**
      * @notice Modifier to verify that the caller is the administrator of the smart name
@@ -84,7 +85,8 @@ contract SmartNameMarket is SmartNameService, PullPayment{
      */
     modifier isAdminOf(bytes32 _id)
     {
-        require(msg.sender == items[_id].smartName.getAdministrator(), "Error: Only the seller is authorized");
+        (address adminAddress,,) = smartNameRegistry.getAdministratorOf(_id);
+        require(msg.sender == adminAddress, "Error: Only the seller is authorized");
         _;
     }
 
@@ -132,18 +134,20 @@ contract SmartNameMarket is SmartNameService, PullPayment{
      * @param _price price
      * @return id and price
      */
-    function sell(bytes32 _id, uint _price) public
+    function sell(bytes32 _id, uint _price, bytes32 _unlocker) public
         isNotOnSale(_id) isAdminOf(_id) returns(bytes32, uint)
     {
+        require(smartNameRegistry.isUnlocker(_id, _unlocker), "Error : the smart name is locked or the unlocker is not correct");
+
         (, SmartName smartName,,,,) = smartNameRegistry.getSmartName(_id);
 
         // Create item
-        Item memory item = Item(smartName, _price);
+        Item memory item = Item(smartName, _price, _unlocker);
         items[_id] = item;
         nbItemsTotal++;
 
         // Update Seller
-        address sellerAddress = smartName.getAdministrator();
+        address sellerAddress = items[_id].smartName.getAdministrator();
         sellers[sellerAddress].addr = sellerAddress;
         sellers[sellerAddress].items.push(_id);
         sellers[sellerAddress].nbItems++;
@@ -151,7 +155,7 @@ contract SmartNameMarket is SmartNameService, PullPayment{
         // Update index in the wallet
         indexes[_id] = sellers[sellerAddress].nbItems-1;
 
-        emit LogForCreation(_id, _price);
+        emit LogForPutOnSaleOnMarket(_id, _price);
         return (_id, _price);
     }
 
@@ -163,9 +167,9 @@ contract SmartNameMarket is SmartNameService, PullPayment{
     function cancelSale(bytes32 _id) public
         isOnSale(_id) isAdminOf(_id) returns(bytes32)
     {
-        removeItem(_id);
+        removeItem(_id, msg.sender);
 
-        emit LogForCancelSale(_id);
+        emit LogForCancelSaleOnMarket(_id);
         return (_id);
     }
 
@@ -179,19 +183,19 @@ contract SmartNameMarket is SmartNameService, PullPayment{
     {
         uint price = items[_id].price;
         address sellerAddress = items[_id].smartName.getAdministrator();
-        require(msg.value > price, "Error : Not enough money to buy this smart name");
+        require(msg.value >= price, "Error : Not enough money to buy this smart name");
         require(msg.sender != sellerAddress, "Error : You are already the administrator avec this smart name");
 
         // Payment
         _asyncTransfer(sellerAddress, price);
 
-        // Remove Item
-        removeItem(_id);
-
         // Update SmartName
-        smartNameRegistry.modifyAdministrator(_id, msg.sender);
+        smartNameRegistry.modifyAdministratorWithUnlocker(_id, msg.sender, items[_id].unlocker);
 
-        emit LogForSale(_id, price, msg.sender);
+        // Remove Item
+        removeItem(_id, sellerAddress);
+
+        emit LogForSaleOnMarket(_id, price, msg.sender);
         return (_id, price, msg.sender);
     }
 
@@ -207,7 +211,7 @@ contract SmartNameMarket is SmartNameService, PullPayment{
     {
         items[_id].price = _newPrice;
 
-        emit LogForPriceUpdate(_id, _newPrice);
+        emit LogForPriceUpdateOnMarket(_id, _newPrice);
         return (_id, _newPrice);
     }
 
@@ -267,22 +271,21 @@ contract SmartNameMarket is SmartNameService, PullPayment{
     /**
      * @notice Remove item
      * @param _id id
+     * @param _seller seller address
      */
-    function removeItem(bytes32 _id) private
-        isOnSale(_id) isAdminOf(_id)
+    function removeItem(bytes32 _id, address _seller) private
     {
+        // Update Seller
+        sellers[_seller].nbItems--;
+        if (sellers[_seller].nbItems == 0) {
+            delete sellers[_seller];
+        } else {
+            delete sellers[_seller].items[indexes[_id]];
+        }
+
         // Delete item
         delete items[_id];
         nbItemsTotal--;
-
-        // Update Seller
-        address sellerAddress = items[_id].smartName.getAdministrator();
-        sellers[sellerAddress].nbItems--;
-        if ( sellers[sellerAddress].nbItems == 0) {
-            delete sellers[sellerAddress];
-        } else {
-            delete sellers[sellerAddress].items[indexes[_id]];
-        }
 
         // Update index
         delete indexes[_id];

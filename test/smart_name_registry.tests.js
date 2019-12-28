@@ -48,6 +48,7 @@ contract('SmartNameRegistry', function(accounts) {
 
         it("Register a smart name", async() => {
             await smartNameRegistryInstance.register(toBytes(name1), toBytes(ext1))
+            await smartNameRegistryInstance.register(toBytes(name2), toBytes(ext2), {from: user})
         })    
 
         it("Register several smart names", async() => {
@@ -100,15 +101,27 @@ contract('SmartNameRegistry', function(accounts) {
             assert.equal(result_wallet[0], emptyId, 'The id of smart name is not deleted of the wallet')
         })
 
-        it("Prevent to abandon a smart name which doesn't exist", async() => {
+        it("Abandon a smart name which doesn't exist", async() => {
             await catchRevert(smartNameRegistryInstance.abandon(id1))
          })
 
-        it("Prevent to abandon a smart name if the caller is not the administrator", async() => {
+        it("Abandon a smart name if the caller is not the administrator", async() => {
             await smartNameRegistryInstance.register(toBytes(name1), toBytes(ext1))
             await smartNameRegistryInstance.modifyAdministrator(id1, user)
             await catchRevert(smartNameRegistryInstance.abandon(id1))
          })
+
+         it("Abandon a smart name with unlocker", async() => {
+            await smartNameRegistryInstance.register(toBytes(name1), toBytes(ext1))
+            await smartNameRegistryInstance.setUnlocker(id1, toBytes("unlocker"))
+            await smartNameRegistryInstance.abandonWithUnlocker(id1, toBytes("unlocker"))
+        })
+
+        it("Abandon a smart name with bad unlocker", async() => {
+            await smartNameRegistryInstance.register(toBytes(name1), toBytes(ext1))
+            await smartNameRegistryInstance.setUnlocker(id1, toBytes("unlocker"))
+            await catchRevert(smartNameRegistryInstance.abandonWithUnlocker(id1, toBytes("badunlocker")))
+        })
     })
 
 
@@ -145,6 +158,11 @@ contract('SmartNameRegistry', function(accounts) {
 
          })
 
+         it("Modify the administrator of a smart name with another account", async() => {
+            await smartNameRegistryInstance.register(toBytes(name1), toBytes(ext1),{from: user})
+            await smartNameRegistryInstance.modifyAdministrator(id1, administrator,{from: user})
+         })
+
         it("Modify the administrator of a smart name which doesn't exist", async() => {
             await catchRevert(smartNameRegistryInstance.modifyAdministrator(id1, user))
          })
@@ -159,6 +177,18 @@ contract('SmartNameRegistry', function(accounts) {
             await smartNameRegistryInstance.modifyAdministrator(id1, user)
             await catchRevert(smartNameRegistryInstance.modifyAdministrator(id1, administrator))
         })
+
+        it("Modify the administrator with unlocker", async() => {
+            await smartNameRegistryInstance.register(toBytes(name1), toBytes(ext1))
+            await smartNameRegistryInstance.setUnlocker(id1, toBytes("unlocker"))
+            await smartNameRegistryInstance.modifyAdministratorWithUnlocker(id1, user, toBytes("unlocker"))
+        })
+
+        it("Modify the administrator with bad unlocker", async() => {
+            await smartNameRegistryInstance.register(toBytes(name1), toBytes(ext1))
+            await smartNameRegistryInstance.setUnlocker(id1, toBytes("unlocker"))
+            await catchRevert(smartNameRegistryInstance.modifyAdministratorWithUnlocker(id1, user, toBytes("badunlocker")))
+        })
     })
 
     describe("ModifyRecord()", async() => { 
@@ -172,6 +202,10 @@ contract('SmartNameRegistry', function(accounts) {
             assert.equal(result_record, record, 'The record of the smart name is not correct')
          })
 
+         it("Modify the record of a smart name with another account", async() => {
+            await smartNameRegistryInstance.register(toBytes(name1), toBytes(ext1), {from: user})
+            await smartNameRegistryInstance.modifyRecord(id1, administrator, {from: user})
+         })
 
         it("Modify the administrator of a smart name which doesn't exist", async() => {
             await catchRevert(smartNameRegistryInstance.modifyRecord(id1, record))
@@ -186,6 +220,18 @@ contract('SmartNameRegistry', function(accounts) {
             await smartNameRegistryInstance.register(toBytes(name1), toBytes(ext1))
             await smartNameRegistryInstance.modifyAdministrator(id1, user)
             await catchRevert(smartNameRegistryInstance.modifyAdministrator(id1, record))
+        })
+
+        it("Modify the record with unlocker", async() => {
+            await smartNameRegistryInstance.register(toBytes(name1), toBytes(ext1))
+            await smartNameRegistryInstance.setUnlocker(id1, toBytes("unlocker"))
+            await smartNameRegistryInstance.modifyAdministratorWithUnlocker(id1, record, toBytes("unlocker"))
+        })
+
+        it("Modify the record with bad unlocker", async() => {
+            await smartNameRegistryInstance.register(toBytes(name1), toBytes(ext1))
+            await smartNameRegistryInstance.setUnlocker(id1, toBytes("unlocker"))
+            await catchRevert(smartNameRegistryInstance.modifyAdministratorWithUnlocker(id1, record, toBytes("badunlocker")))
         })
 
     })
