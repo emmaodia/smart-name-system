@@ -1,0 +1,607 @@
+{
+    "name" : "SmartNameRegistry",
+    "abi" : [
+        {
+            "anonymous": false,
+            "inputs": [
+                {
+                    "indexed": false,
+                    "internalType": "bytes32",
+                    "name": "id",
+                    "type": "bytes32"
+                },
+                {
+                    "indexed": false,
+                    "internalType": "contract SmartName",
+                    "name": "smartName",
+                    "type": "address"
+                }
+            ],
+            "name": "LogForAbandonByRegistry",
+            "type": "event"
+        },
+        {
+            "anonymous": false,
+            "inputs": [
+                {
+                    "indexed": false,
+                    "internalType": "bytes32",
+                    "name": "id",
+                    "type": "bytes32"
+                },
+                {
+                    "indexed": false,
+                    "internalType": "contract SmartName",
+                    "name": "smartName",
+                    "type": "address"
+                }
+            ],
+            "name": "LogForAdministratorUpdateByRegistry",
+            "type": "event"
+        },
+        {
+            "anonymous": false,
+            "inputs": [
+                {
+                    "indexed": false,
+                    "internalType": "bytes32",
+                    "name": "id",
+                    "type": "bytes32"
+                },
+                {
+                    "indexed": false,
+                    "internalType": "contract SmartName",
+                    "name": "smartName",
+                    "type": "address"
+                }
+            ],
+            "name": "LogForRecordUpdateByRegistry",
+            "type": "event"
+        },
+        {
+            "anonymous": false,
+            "inputs": [
+                {
+                    "indexed": false,
+                    "internalType": "bytes32",
+                    "name": "id",
+                    "type": "bytes32"
+                },
+                {
+                    "indexed": false,
+                    "internalType": "contract SmartName",
+                    "name": "smartName",
+                    "type": "address"
+                }
+            ],
+            "name": "LogForRegisterByRegistry",
+            "type": "event"
+        },
+        {
+            "constant": false,
+            "inputs": [
+                {
+                    "internalType": "bytes32",
+                    "name": "_id",
+                    "type": "bytes32"
+                }
+            ],
+            "name": "abandon",
+            "outputs": [],
+            "payable": false,
+            "stateMutability": "nonpayable",
+            "type": "function"
+        },
+        {
+            "constant": false,
+            "inputs": [
+                {
+                    "internalType": "bytes32",
+                    "name": "_id",
+                    "type": "bytes32"
+                },
+                {
+                    "internalType": "bytes32",
+                    "name": "_unlocker",
+                    "type": "bytes32"
+                }
+            ],
+            "name": "abandonWithUnlocker",
+            "outputs": [],
+            "payable": false,
+            "stateMutability": "nonpayable",
+            "type": "function"
+        },
+        {
+            "constant": true,
+            "inputs": [
+                {
+                    "internalType": "address",
+                    "name": "",
+                    "type": "address"
+                }
+            ],
+            "name": "administrators",
+            "outputs": [
+                {
+                    "internalType": "address",
+                    "name": "addr",
+                    "type": "address"
+                },
+                {
+                    "internalType": "uint256",
+                    "name": "nbSmartNames",
+                    "type": "uint256"
+                }
+            ],
+            "payable": false,
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "constant": true,
+            "inputs": [],
+            "name": "getAdministrator",
+            "outputs": [
+                {
+                    "internalType": "address",
+                    "name": "",
+                    "type": "address"
+                },
+                {
+                    "internalType": "uint256",
+                    "name": "",
+                    "type": "uint256"
+                },
+                {
+                    "internalType": "bytes32[]",
+                    "name": "",
+                    "type": "bytes32[]"
+                }
+            ],
+            "payable": false,
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "constant": true,
+            "inputs": [
+                {
+                    "internalType": "address",
+                    "name": "_address",
+                    "type": "address"
+                }
+            ],
+            "name": "getAdministratorByAddress",
+            "outputs": [
+                {
+                    "internalType": "address",
+                    "name": "",
+                    "type": "address"
+                },
+                {
+                    "internalType": "uint256",
+                    "name": "",
+                    "type": "uint256"
+                },
+                {
+                    "internalType": "bytes32[]",
+                    "name": "",
+                    "type": "bytes32[]"
+                }
+            ],
+            "payable": false,
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "constant": true,
+            "inputs": [
+                {
+                    "internalType": "bytes32",
+                    "name": "_id",
+                    "type": "bytes32"
+                }
+            ],
+            "name": "getAdministratorOf",
+            "outputs": [
+                {
+                    "internalType": "address",
+                    "name": "",
+                    "type": "address"
+                },
+                {
+                    "internalType": "uint256",
+                    "name": "",
+                    "type": "uint256"
+                },
+                {
+                    "internalType": "bytes32[]",
+                    "name": "",
+                    "type": "bytes32[]"
+                }
+            ],
+            "payable": false,
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "constant": true,
+            "inputs": [
+                {
+                    "internalType": "bytes16",
+                    "name": "_name",
+                    "type": "bytes16"
+                },
+                {
+                    "internalType": "bytes4",
+                    "name": "_ext",
+                    "type": "bytes4"
+                }
+            ],
+            "name": "getIdOf",
+            "outputs": [
+                {
+                    "internalType": "bytes32",
+                    "name": "",
+                    "type": "bytes32"
+                }
+            ],
+            "payable": false,
+            "stateMutability": "pure",
+            "type": "function"
+        },
+        {
+            "constant": true,
+            "inputs": [],
+            "name": "getNbSmartNamesTotal",
+            "outputs": [
+                {
+                    "internalType": "uint256",
+                    "name": "",
+                    "type": "uint256"
+                }
+            ],
+            "payable": false,
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "constant": true,
+            "inputs": [
+                {
+                    "internalType": "bytes32",
+                    "name": "_id",
+                    "type": "bytes32"
+                }
+            ],
+            "name": "getSmartName",
+            "outputs": [
+                {
+                    "internalType": "bytes32",
+                    "name": "",
+                    "type": "bytes32"
+                },
+                {
+                    "internalType": "contract SmartName",
+                    "name": "",
+                    "type": "address"
+                },
+                {
+                    "internalType": "bytes16",
+                    "name": "",
+                    "type": "bytes16"
+                },
+                {
+                    "internalType": "bytes4",
+                    "name": "",
+                    "type": "bytes4"
+                },
+                {
+                    "internalType": "address",
+                    "name": "",
+                    "type": "address"
+                },
+                {
+                    "internalType": "address",
+                    "name": "",
+                    "type": "address"
+                }
+            ],
+            "payable": false,
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "constant": true,
+            "inputs": [
+                {
+                    "internalType": "bytes32",
+                    "name": "",
+                    "type": "bytes32"
+                }
+            ],
+            "name": "indexes",
+            "outputs": [
+                {
+                    "internalType": "uint256",
+                    "name": "",
+                    "type": "uint256"
+                }
+            ],
+            "payable": false,
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "constant": true,
+            "inputs": [
+                {
+                    "internalType": "bytes32",
+                    "name": "_id",
+                    "type": "bytes32"
+                },
+                {
+                    "internalType": "bytes32",
+                    "name": "_unlocker",
+                    "type": "bytes32"
+                }
+            ],
+            "name": "isUnlocker",
+            "outputs": [
+                {
+                    "internalType": "bool",
+                    "name": "",
+                    "type": "bool"
+                }
+            ],
+            "payable": false,
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "constant": false,
+            "inputs": [
+                {
+                    "internalType": "bytes32",
+                    "name": "_id",
+                    "type": "bytes32"
+                },
+                {
+                    "internalType": "address",
+                    "name": "_newAdministrator",
+                    "type": "address"
+                }
+            ],
+            "name": "modifyAdministrator",
+            "outputs": [
+                {
+                    "internalType": "bytes32",
+                    "name": "",
+                    "type": "bytes32"
+                },
+                {
+                    "internalType": "contract SmartName",
+                    "name": "",
+                    "type": "address"
+                }
+            ],
+            "payable": false,
+            "stateMutability": "nonpayable",
+            "type": "function"
+        },
+        {
+            "constant": false,
+            "inputs": [
+                {
+                    "internalType": "bytes32",
+                    "name": "_id",
+                    "type": "bytes32"
+                },
+                {
+                    "internalType": "address",
+                    "name": "_newAdministrator",
+                    "type": "address"
+                },
+                {
+                    "internalType": "bytes32",
+                    "name": "_unlocker",
+                    "type": "bytes32"
+                }
+            ],
+            "name": "modifyAdministratorWithUnlocker",
+            "outputs": [
+                {
+                    "internalType": "bytes32",
+                    "name": "",
+                    "type": "bytes32"
+                },
+                {
+                    "internalType": "contract SmartName",
+                    "name": "",
+                    "type": "address"
+                }
+            ],
+            "payable": false,
+            "stateMutability": "nonpayable",
+            "type": "function"
+        },
+        {
+            "constant": false,
+            "inputs": [
+                {
+                    "internalType": "bytes32",
+                    "name": "_id",
+                    "type": "bytes32"
+                },
+                {
+                    "internalType": "address",
+                    "name": "_newRecord",
+                    "type": "address"
+                }
+            ],
+            "name": "modifyRecord",
+            "outputs": [
+                {
+                    "internalType": "bytes32",
+                    "name": "",
+                    "type": "bytes32"
+                },
+                {
+                    "internalType": "contract SmartName",
+                    "name": "",
+                    "type": "address"
+                }
+            ],
+            "payable": false,
+            "stateMutability": "nonpayable",
+            "type": "function"
+        },
+        {
+            "constant": false,
+            "inputs": [
+                {
+                    "internalType": "bytes32",
+                    "name": "_id",
+                    "type": "bytes32"
+                },
+                {
+                    "internalType": "address",
+                    "name": "_newRecord",
+                    "type": "address"
+                },
+                {
+                    "internalType": "bytes32",
+                    "name": "_unlocker",
+                    "type": "bytes32"
+                }
+            ],
+            "name": "modifyRecordWithUnlocker",
+            "outputs": [
+                {
+                    "internalType": "bytes32",
+                    "name": "",
+                    "type": "bytes32"
+                },
+                {
+                    "internalType": "contract SmartName",
+                    "name": "",
+                    "type": "address"
+                }
+            ],
+            "payable": false,
+            "stateMutability": "nonpayable",
+            "type": "function"
+        },
+        {
+            "constant": true,
+            "inputs": [],
+            "name": "nbSmartNamesTotal",
+            "outputs": [
+                {
+                    "internalType": "uint256",
+                    "name": "",
+                    "type": "uint256"
+                }
+            ],
+            "payable": false,
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "constant": false,
+            "inputs": [
+                {
+                    "internalType": "bytes16",
+                    "name": "_name",
+                    "type": "bytes16"
+                },
+                {
+                    "internalType": "bytes4",
+                    "name": "_ext",
+                    "type": "bytes4"
+                }
+            ],
+            "name": "register",
+            "outputs": [
+                {
+                    "internalType": "bytes32",
+                    "name": "",
+                    "type": "bytes32"
+                },
+                {
+                    "internalType": "contract SmartName",
+                    "name": "",
+                    "type": "address"
+                }
+            ],
+            "payable": false,
+            "stateMutability": "nonpayable",
+            "type": "function"
+        },
+        {
+            "constant": false,
+            "inputs": [
+                {
+                    "internalType": "bytes32",
+                    "name": "_id",
+                    "type": "bytes32"
+                }
+            ],
+            "name": "removeUnlocker",
+            "outputs": [],
+            "payable": false,
+            "stateMutability": "nonpayable",
+            "type": "function"
+        },
+        {
+            "constant": false,
+            "inputs": [
+                {
+                    "internalType": "bytes32",
+                    "name": "_id",
+                    "type": "bytes32"
+                },
+                {
+                    "internalType": "bytes32",
+                    "name": "_unlocker",
+                    "type": "bytes32"
+                }
+            ],
+            "name": "setUnlocker",
+            "outputs": [],
+            "payable": false,
+            "stateMutability": "nonpayable",
+            "type": "function"
+        },
+        {
+            "constant": true,
+            "inputs": [
+                {
+                    "internalType": "bytes32",
+                    "name": "",
+                    "type": "bytes32"
+                }
+            ],
+            "name": "smartNames",
+            "outputs": [
+                {
+                    "internalType": "contract SmartName",
+                    "name": "",
+                    "type": "address"
+                }
+            ],
+            "payable": false,
+            "stateMutability": "view",
+            "type": "function"
+        }
+    ], 
+    "networks": {
+        "5777": {
+          "events": {},
+          "links": {},
+          "address": "0xDEFB17e660828aF41035bf29b642C89906A71306",
+          "transactionHash": "0x7f3b4381a58467f962c15fac52c52ae5a61acd3108a2615a47432ccaea5750b6"
+        }
+      }
+}

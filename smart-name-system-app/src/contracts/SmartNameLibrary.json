@@ -1,0 +1,28 @@
+[
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"internalType": "bytes16",
+				"name": "_name",
+				"type": "bytes16"
+			},
+			{
+				"internalType": "bytes4",
+				"name": "_ext",
+				"type": "bytes4"
+			}
+		],
+		"name": "getIdOf",
+		"outputs": [
+			{
+				"internalType": "bytes32",
+				"name": "",
+				"type": "bytes32"
+			}
+		],
+		"payable": false,
+		"stateMutability": "pure",
+		"type": "function"
+	}
+]
