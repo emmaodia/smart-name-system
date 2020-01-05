@@ -8,15 +8,28 @@
     <div>
       <form id="registry-form" @submit="registerSmartName">
         <div class="form-group">
-          <input  id="smartName" v-model="smartName" type="text" class="smartname-input" aria-describedby="emailHelp" placeholder="Enter a smart name">
+          <input  id="smartNameInput" v-model="smartNameInput" type="text" class="smartname-input" placeholder="Enter a smart name">
           <small class="form-text text-muted">example : myname.com</small>
         </div>
         <button type="submit" class="btn btn-secondary">Submit</button>
         <div v-if="errors.length">
-           <p v-for="error in errors" v-bind:key="error"> Error : {{ error }}</p>
+          <div class="card smartname-card">
+            <div class="card-header bg-danger text-white">Error</div>
+            <div class="card-body smartname-info">
+                <p v-for="error in errors" v-bind:key="error">{{ error }}</p>
+            </div>
+          </div>
         </div>
         <div v-if="success">
-           <p>Success</p>
+          <div class="card smartname-card">
+            <div class="card-header bg-success text-white">{{ smartName.name }}.{{ smartName.ext }} is registered</div>
+            <div class="card-body smartname-info">
+                <p><b>Id: </b>{{ smartName.id }}</p>
+                <p><b>Address: </b>{{ smartName.address }}</p>
+                <p><b>Administrator: </b>{{ smartName.administrator }}</p>
+                <p><b>Record: </b>{{ smartName.record }}</p>
+            </div>
+          </div>
         </div>
       </form>
     </div>
@@ -35,7 +48,15 @@ export default {
     return {
       errors: [],
       success: false,
-      smartName: null
+      smartName: {
+        id: null,
+        address: null,
+        name: null,
+        ext: null,
+        administrator: null,
+        record: null
+      },
+      smartNameInput: null
     }
   },
   computed: {
@@ -45,8 +66,8 @@ export default {
     accounts () {
       return this.$store.state.accounts
     },
-    contract () {
-      return this.$store.state.contract
+    smartNameRegistry () {
+      return this.$store.state.smartNameRegistry
     },
     networkId () {
       return this.$store.state.networkId
@@ -59,28 +80,63 @@ export default {
     }
   },
   methods: {
-    registerSmartName: function (e) {
+    toBytes: function (input) { return this.$store.state.web3.utils.fromAscii(input) },
+    registerSmartName: async function (e) {
       this.errors = []
-      if (!this.smartName) {
+      this.success = false
+      this.smartNameInfo = {
+        id: null,
+        address: null,
+        name: null,
+        ext: null,
+        administrator: null,
+        record: null
+      }
+
+      // Check if smart name is null
+      if (!this.smartNameInput) {
         this.errors.push('The smart name is null.')
         return false
       }
 
-      const data = this.smartName.split('.')
+      const data = this.smartNameInput.split('.')
       const name = data[0]
       const ext = data[1]
 
+      // Check format
       if (data.length === 2 && name.length > 0 && name.length <= 16 && ext.length > 0 && ext.length <= 4) {
-        this.success = true
-        return true
+        try {
+          // Register
+          await this.$store.state.smartNameRegistry.methods.register(this.toBytes(name), this.toBytes(ext)).send({ from: this.$store.state.accounts[0] })
+
+          // Get Id
+          let id = await this.$store.state.smartNameRegistry.methods.getIdOf(this.toBytes(name), this.toBytes(ext)).call()
+
+          // Get info
+          let smartNameInfo = await this.$store.state.smartNameRegistry.methods.getSmartName(id).call()
+
+          // Store smart name
+          this.smartName.id = id
+          this.smartName.address = smartNameInfo[1]
+          this.smartName.name = name
+          this.smartName.ext = ext
+          this.smartName.administrator = smartNameInfo[4]
+          this.smartName.record = smartNameInfo[5]
+
+          this.success = true
+          return true
+        } catch (error) {
+          this.errors.push('This smart is already registered.')
+          // this.errors.push(error)
+          return false
+        }
       } else {
-        this.errors.push('The format of the smart name is not correct')
+        this.errors.push('The format of the smart name is not correct.')
         return false
       }
     }
   }
 }
-
 </script>
 
 <style scoped>
@@ -100,5 +156,15 @@ a {
 }
 .smartname-input {
   width: 50%;
+}
+.smartname-info {
+   text-align: left;
+   position: center;
+}
+.smartname-card {
+   margin-left: 25%;
+   margin-right: 25%;
+   margin-top: 2%;
+   margin-bottom: 2%;
 }
 </style>
