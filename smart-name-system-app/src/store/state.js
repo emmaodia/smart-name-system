@@ -4,6 +4,12 @@ let state = {
   accounts: null,
   coinbase: null,
   balance: 0,
-  smartNameRegistry: null
+  smartName: null,
+  smartNameRegistry: null,
+  smartNameService: null,
+  smartNameResolver: null,
+  smartNameBanking: null,
+  smartNameMarket: null,
+  smartNameLibrary: null
 }
 export default state

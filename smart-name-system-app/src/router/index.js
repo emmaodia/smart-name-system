@@ -21,14 +21,19 @@ const routes = [
     component: () => import('../views/MySmartNames.vue')
   },
   {
-    path: '/market',
-    name: 'market',
-    component: () => import('../views/Market.vue')
+    path: '/resolver',
+    name: 'resolver',
+    component: () => import('../views/Resolver.vue')
   },
   {
     path: '/banking',
     name: 'banking',
     component: () => import('../views/Banking.vue')
+  },
+  {
+    path: '/market',
+    name: 'market',
+    component: () => import('../views/Market.vue')
   }
 ]
 

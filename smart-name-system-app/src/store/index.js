@@ -2,7 +2,11 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import state from './state'
 import getWeb3 from '../util/getWeb3'
-import SmartNameRegistry from '../contracts/SmartNameRegistry.json'
+import SmartNameRegistry from '../../../smart-name-system-contracts/build/contracts/SmartNameRegistry.json'
+import SmartNameResolver from '../../../smart-name-system-contracts/build/contracts/SmartNameResolver.json'
+import SmartNameBanking from '../../../smart-name-system-contracts/build/contracts/SmartNameBanking.json'
+import SmartNameMarket from '../../../smart-name-system-contracts/build/contracts/SmartNameMarket.json'
+import SmartNameLibrary from '../../../smart-name-system-contracts/build/contracts/SmartNameLibrary.json'
 
 Vue.use(Vuex)
 export const store = new Vuex.Store({
@@ -24,6 +28,10 @@ export const store = new Vuex.Store({
       stateCopy.networkId = currentState.networkId
 
       stateCopy.smartNameRegistry = currentState.smartNameRegistry
+      stateCopy.smartNameResolver = currentState.smartNameResolver
+      stateCopy.smartNameBanking = currentState.smartNameBanking
+      stateCopy.smartNameMarket = currentState.smartNameMarket
+      stateCopy.smartNameLibrary = currentState.smartNameLibrary
 
       state = stateCopy
     }
@@ -42,10 +50,34 @@ export const store = new Vuex.Store({
       currentState.contract = null
       currentState.networkId = await web3.eth.net.getId()
 
-      // Get the contract instance.
-      const deployedNetwork = SmartNameRegistry.networks[currentState.networkId]
+      // Registry
+      let deployedNetwork = SmartNameRegistry.networks[currentState.networkId]
       currentState.smartNameRegistry = new web3.eth.Contract(
         SmartNameRegistry.abi,
+        deployedNetwork && deployedNetwork.address
+      )
+      // Resolver
+      deployedNetwork = SmartNameResolver.networks[currentState.networkId]
+      currentState.smartNameResolver = new web3.eth.Contract(
+        SmartNameResolver.abi,
+        deployedNetwork && deployedNetwork.address
+      )
+      // Banking
+      deployedNetwork = SmartNameBanking.networks[currentState.networkId]
+      currentState.smartNameBanking = new web3.eth.Contract(
+        SmartNameBanking.abi,
+        deployedNetwork && deployedNetwork.address
+      )
+      // Market
+      deployedNetwork = SmartNameMarket.networks[currentState.networkId]
+      currentState.smartNameMarket = new web3.eth.Contract(
+        SmartNameMarket.abi,
+        deployedNetwork && deployedNetwork.address
+      )
+      // Library
+      deployedNetwork = SmartNameLibrary.networks[currentState.networkId]
+      currentState.smartNameLibrary = new web3.eth.Contract(
+        SmartNameLibrary.abi,
         deployedNetwork && deployedNetwork.address
       )
       commit('registerWeb3Instance', currentState)

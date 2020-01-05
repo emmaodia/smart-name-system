@@ -156,26 +156,6 @@ export default {
       newAdministratorInput: null
     }
   },
-  computed: {
-    web3 () {
-      return this.$store.state.web3
-    },
-    accounts () {
-      return this.$store.state.accounts
-    },
-    smartNameRegistry () {
-      return this.$store.state.smartNameRegistry
-    },
-    networkId () {
-      return this.$store.state.networkId
-    },
-    coinbase () {
-      return this.$store.state.coinbase
-    },
-    balance () {
-      return this.$store.state.balance / Math.pow(10, 18)
-    }
-  },
   methods: {
     toAscii: function (input) { return this.$store.state.web3.utils.toAscii(input).replace(/\u0000/g, '') },
     getAllSmartNames: async function (e) {

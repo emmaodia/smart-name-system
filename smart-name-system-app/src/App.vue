@@ -4,8 +4,9 @@
       <router-link to="/">Home</router-link> |
       <router-link to="/registry">Registry</router-link> |
       <router-link to="/my-smart-names">My Smart Names</router-link> |
-      <router-link to="/market">Market</router-link> |
-      <router-link to="/banking">Banking</router-link>
+      <router-link to="/resolver">Resolver</router-link> |
+      <router-link to="/banking">Banking</router-link> |
+      <router-link to="/market">Market</router-link>
     </div>
     <router-view/>
   </div>

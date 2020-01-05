@@ -24451,10 +24451,277 @@
       },
       "address": "0xa6cE8f40689c511989ed904b61430Ac7b27a7b1f",
       "transactionHash": "0x61137f89935ea5105737d2707123760e5a51ea6fe2b29a9922ef4951986f82ae"
+    },
+    "1578223223537": {
+      "events": {
+        "0xfea304026fe97f37c0af6cccadb8269876a20cc1c16e7d4972fc36872eb880e2": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "bytes32",
+              "name": "id",
+              "type": "bytes32"
+            },
+            {
+              "indexed": false,
+              "internalType": "contract SmartName",
+              "name": "smartName",
+              "type": "address"
+            }
+          ],
+          "name": "LogForAbandonByRegistry",
+          "type": "event",
+          "signature": "0xfea304026fe97f37c0af6cccadb8269876a20cc1c16e7d4972fc36872eb880e2"
+        },
+        "0x596a8f5115701564eb0259c9d8587012f147442068124f6ccb62e1e363bbd676": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "bytes32",
+              "name": "id",
+              "type": "bytes32"
+            },
+            {
+              "indexed": false,
+              "internalType": "contract SmartName",
+              "name": "smartName",
+              "type": "address"
+            }
+          ],
+          "name": "LogForAdministratorUpdateByRegistry",
+          "type": "event",
+          "signature": "0x596a8f5115701564eb0259c9d8587012f147442068124f6ccb62e1e363bbd676"
+        },
+        "0x4af9da156424d3007e6186ee5c256531d72747794d5037668a44dee832c9f5d5": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "bytes32",
+              "name": "id",
+              "type": "bytes32"
+            },
+            {
+              "indexed": false,
+              "internalType": "contract SmartName",
+              "name": "smartName",
+              "type": "address"
+            }
+          ],
+          "name": "LogForRecordUpdateByRegistry",
+          "type": "event",
+          "signature": "0x4af9da156424d3007e6186ee5c256531d72747794d5037668a44dee832c9f5d5"
+        },
+        "0xadd00203df97b2a8dc4f8f96cfdec210918d80ec01826e2ae2b24b08e6cfe8e8": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "bytes32",
+              "name": "id",
+              "type": "bytes32"
+            },
+            {
+              "indexed": false,
+              "internalType": "contract SmartName",
+              "name": "smartName",
+              "type": "address"
+            }
+          ],
+          "name": "LogForRegisterByRegistry",
+          "type": "event",
+          "signature": "0xadd00203df97b2a8dc4f8f96cfdec210918d80ec01826e2ae2b24b08e6cfe8e8"
+        }
+      },
+      "links": {
+        "SmartNameLibrary": "0x6e5118AEA268C3820B8ab8034EF1b1855813bcB5"
+      },
+      "address": "0x2D6D2c260CA158148F74ea191a109614c687404d",
+      "transactionHash": "0x5c6b2de1e863cf30cbeb4d1de70f9d7f74e752bdbff61d748725ca89e338460e"
+    },
+    "1578223398812": {
+      "events": {
+        "0xfea304026fe97f37c0af6cccadb8269876a20cc1c16e7d4972fc36872eb880e2": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "bytes32",
+              "name": "id",
+              "type": "bytes32"
+            },
+            {
+              "indexed": false,
+              "internalType": "contract SmartName",
+              "name": "smartName",
+              "type": "address"
+            }
+          ],
+          "name": "LogForAbandonByRegistry",
+          "type": "event",
+          "signature": "0xfea304026fe97f37c0af6cccadb8269876a20cc1c16e7d4972fc36872eb880e2"
+        },
+        "0x596a8f5115701564eb0259c9d8587012f147442068124f6ccb62e1e363bbd676": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "bytes32",
+              "name": "id",
+              "type": "bytes32"
+            },
+            {
+              "indexed": false,
+              "internalType": "contract SmartName",
+              "name": "smartName",
+              "type": "address"
+            }
+          ],
+          "name": "LogForAdministratorUpdateByRegistry",
+          "type": "event",
+          "signature": "0x596a8f5115701564eb0259c9d8587012f147442068124f6ccb62e1e363bbd676"
+        },
+        "0x4af9da156424d3007e6186ee5c256531d72747794d5037668a44dee832c9f5d5": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "bytes32",
+              "name": "id",
+              "type": "bytes32"
+            },
+            {
+              "indexed": false,
+              "internalType": "contract SmartName",
+              "name": "smartName",
+              "type": "address"
+            }
+          ],
+          "name": "LogForRecordUpdateByRegistry",
+          "type": "event",
+          "signature": "0x4af9da156424d3007e6186ee5c256531d72747794d5037668a44dee832c9f5d5"
+        },
+        "0xadd00203df97b2a8dc4f8f96cfdec210918d80ec01826e2ae2b24b08e6cfe8e8": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "bytes32",
+              "name": "id",
+              "type": "bytes32"
+            },
+            {
+              "indexed": false,
+              "internalType": "contract SmartName",
+              "name": "smartName",
+              "type": "address"
+            }
+          ],
+          "name": "LogForRegisterByRegistry",
+          "type": "event",
+          "signature": "0xadd00203df97b2a8dc4f8f96cfdec210918d80ec01826e2ae2b24b08e6cfe8e8"
+        }
+      },
+      "links": {
+        "SmartNameLibrary": "0x211120956c5c6176fa948aa0266F7D26458Eef70"
+      },
+      "address": "0x9C7D00c9AdDB5Cb00e8de80C8226DCab2cd16c0F",
+      "transactionHash": "0xdbd0ff20aba91838dea3bd841476880c3da9affab6fd36f2b3d0e947263c4b5a"
+    },
+    "1578224027614": {
+      "events": {
+        "0xfea304026fe97f37c0af6cccadb8269876a20cc1c16e7d4972fc36872eb880e2": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "bytes32",
+              "name": "id",
+              "type": "bytes32"
+            },
+            {
+              "indexed": false,
+              "internalType": "contract SmartName",
+              "name": "smartName",
+              "type": "address"
+            }
+          ],
+          "name": "LogForAbandonByRegistry",
+          "type": "event",
+          "signature": "0xfea304026fe97f37c0af6cccadb8269876a20cc1c16e7d4972fc36872eb880e2"
+        },
+        "0x596a8f5115701564eb0259c9d8587012f147442068124f6ccb62e1e363bbd676": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "bytes32",
+              "name": "id",
+              "type": "bytes32"
+            },
+            {
+              "indexed": false,
+              "internalType": "contract SmartName",
+              "name": "smartName",
+              "type": "address"
+            }
+          ],
+          "name": "LogForAdministratorUpdateByRegistry",
+          "type": "event",
+          "signature": "0x596a8f5115701564eb0259c9d8587012f147442068124f6ccb62e1e363bbd676"
+        },
+        "0x4af9da156424d3007e6186ee5c256531d72747794d5037668a44dee832c9f5d5": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "bytes32",
+              "name": "id",
+              "type": "bytes32"
+            },
+            {
+              "indexed": false,
+              "internalType": "contract SmartName",
+              "name": "smartName",
+              "type": "address"
+            }
+          ],
+          "name": "LogForRecordUpdateByRegistry",
+          "type": "event",
+          "signature": "0x4af9da156424d3007e6186ee5c256531d72747794d5037668a44dee832c9f5d5"
+        },
+        "0xadd00203df97b2a8dc4f8f96cfdec210918d80ec01826e2ae2b24b08e6cfe8e8": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "bytes32",
+              "name": "id",
+              "type": "bytes32"
+            },
+            {
+              "indexed": false,
+              "internalType": "contract SmartName",
+              "name": "smartName",
+              "type": "address"
+            }
+          ],
+          "name": "LogForRegisterByRegistry",
+          "type": "event",
+          "signature": "0xadd00203df97b2a8dc4f8f96cfdec210918d80ec01826e2ae2b24b08e6cfe8e8"
+        }
+      },
+      "links": {
+        "SmartNameLibrary": "0xE47ab1Bb8E006F5f640A128D3BBc19EeF91E2786"
+      },
+      "address": "0x50d7C8242a3Ab468bC02b6e2dE49119Af54158D9",
+      "transactionHash": "0x349adc99e33653feb1787625ff320dedf6023db8f41585998805802d8220b9b4"
     }
   },
   "schemaVersion": "3.0.18",
-  "updatedAt": "2020-01-05T08:11:25.060Z",
+  "updatedAt": "2020-01-05T11:34:03.483Z",
   "networkType": "ethereum",
   "devdoc": {
     "author": "Steve Despres - @stevedespres - steve.despres@protonmail.com",

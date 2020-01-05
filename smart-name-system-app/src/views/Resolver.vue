@@ -1,17 +1,16 @@
 <template>
-  <div class="registry">
-      <div class="hello">
-      <h1>Registry</h1>
-        <p>You can register a smart name. A Smart name is composed of a name (1-16 characters) and an extension (1-4 characters), separated by a dot : "name"."ext"</p>
+  <div class="resolver">
+    <div class="hello">
+      <h1>Resolver</h1>
+        <p>Get informations about smart names registered</p>
     </div>
-    <br>
     <div>
-      <form id="registry-form" @submit="registerSmartName">
+      <form id="registry-form" @submit="resolveSmartName">
         <div class="form-group">
           <input  id="smartNameInput" v-model="smartNameInput" type="text" class="smartname-input" placeholder="Enter a smart name">
           <small class="form-text text-muted">example : myname.com</small>
         </div>
-        <button type="submit" class="btn btn-secondary">Register</button>
+        <button type="submit" class="btn btn-secondary">Get</button>
         <div v-if="errors.length">
           <div class="card smartname-card">
             <div class="card-header bg-danger text-white">Error</div>
@@ -22,7 +21,7 @@
         </div>
         <div v-if="success">
           <div class="card smartname-card">
-            <div class="card-header bg-success text-white">{{ smartName.name }}.{{ smartName.ext }} is registered</div>
+            <div class="card-header bg-secondary text-white">Informations</div>
             <div class="card-body smartname-info">
                 <p><b>Id: </b>{{ smartName.id }}</p>
                 <p><b>Address: </b>{{ smartName.address }}</p>
@@ -38,9 +37,8 @@
 
 <script>
 export default {
-  name: 'registry',
+  name: 'my-smart-names',
   beforeCreate () {
-    console.log('registerWeb3 Action dispatched from Home.vue')
     this.$store.dispatch('registerWeb3')
   },
   components: {},
@@ -61,7 +59,9 @@ export default {
   },
   methods: {
     toBytes: function (input) { return this.$store.state.web3.utils.fromAscii(input) },
-    registerSmartName: async function (e) {
+    toAscii: function (input) { return this.$store.state.web3.utils.toAscii(input).replace(/\u0000/g, '') },
+    resolveSmartName: async function (e) {
+      // Init
       this.errors = []
       this.success = false
       this.smartNameInfo = {
@@ -72,7 +72,6 @@ export default {
         administrator: null,
         record: null
       }
-
       // Check if smart name is null
       if (!this.smartNameInput) {
         this.errors.push('The smart name is null.')
@@ -86,28 +85,23 @@ export default {
       // Check format
       if (data.length === 2 && name.length > 0 && name.length <= 16 && ext.length > 0 && ext.length <= 4) {
         try {
-          // Register
-          await this.$store.state.smartNameRegistry.methods.register(this.toBytes(name), this.toBytes(ext)).send({ from: this.$store.state.accounts[0] })
-
-          // Get Id
+          // Resolve
           let id = await this.$store.state.smartNameRegistry.methods.getIdOf(this.toBytes(name), this.toBytes(ext)).call()
+          let record = await this.$store.state.smartNameResolver.methods.resolve(this.toBytes(name), this.toBytes(ext)).call()
+          let admin = await this.$store.state.smartNameResolver.methods.get(this.toBytes(name), this.toBytes(ext)).call()
+          let address = await this.$store.state.smartNameResolver.methods.get(this.toBytes(name), this.toBytes(ext)).call()
 
-          // Get info
-          let smartNameInfo = await this.$store.state.smartNameRegistry.methods.getSmartName(id).call()
-
-          // Store smart name
           this.smartName.id = id
-          this.smartName.address = smartNameInfo[1]
+          this.smartName.address = address
           this.smartName.name = name
           this.smartName.ext = ext
-          this.smartName.administrator = smartNameInfo[4]
-          this.smartName.record = smartNameInfo[5]
+          this.smartName.administrator = admin
+          this.smartName.record = record
 
           this.success = true
           return true
         } catch (error) {
-          this.errors.push('This smart is already registered.')
-          // this.errors.push(error)
+          this.errors.push('This smart is not registered')
           return false
         }
       } else {

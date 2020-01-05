@@ -1,21 +1,34 @@
 <template>
   <div class="home">
-      <div class="hello">
+    <div class="hello">
       <h1>Smart Name System</h1>
         <p>Smart Name System is a decentralized application that allows to register and manage smart names.</p>
         <p> A smart name is a name with the same form that a traditionnal domain name (name.extension).</p>
         <p>This application offers several services</p>
-        <li>Registry</li>
-        <li>Resolver</li>
-        <li>Banking</li>
-        <li>Market</li>
+        <li><b>Registry</b></li>
+        <li><b>Resolver</b></li>
+        <li><b>Banking</b></li>
+        <li><b>Market</b></li>
     </div>
     <br>
-    <div class='metamask-info'>
-      <p>Network: {{ networkId }}</p>
-      <p>Coinbase: {{ coinbase }} </p>
-      <p>Balance: {{ balance }} ETH</p>
-    </div>
+      <div class="card smartname-card">
+        <div class="card-header bg-secondary text-white">Informations</div>
+        <div class="card-body smartname-info">
+          <p><b>Network id : </b>{{ networkId }}</p>
+          <p><b>Account: </b>{{ accounts[0] }}</p>
+          <p><b>Balance: </b>{{ balance }} ETH</p>
+        </div>
+      </div>
+      <div class="card smartname-card">
+        <div class="card-header bg-secondary text-white">Contracts</div>
+        <div class="card-body smartname-info">
+          <p><b>SmartNameRegistry : </b>{{ smartNameRegistry.options.address }}</p>
+          <p><b>SmartNameResolver : </b>{{ smartNameResolver.options.address }}</p>
+          <p><b>SmartNameBanking : </b>{{ smartNameBanking.options.address }}</p>
+          <p><b>SmartNameMarket : </b>{{ smartNameMarket.options.address }}</p>
+          <p><b>SmartNameLibrary : </b>{{ smartNameLibrary.options.address }}</p>
+        </div>
+      </div>
   </div>
 </template>
 
@@ -45,6 +58,23 @@ export default {
     },
     balance () {
       return this.$store.state.balance / Math.pow(10, 18)
+    },
+    smartNameRegistry () {
+      console.log(this.$store.state.smartNameRegistry)
+      return this.$store.state.smartNameRegistry
+    },
+    smartNameResolver () {
+      return this.$store.state.smartNameResolver
+    },
+    smartNameBanking () {
+      return this.$store.state.smartNameBanking
+    },
+    smartNameMarket () {
+      return this.$store.state.smartNameMarket
+    },
+    smartNameLibrary () {
+      console.log(this.$store.state.smartNameLibrary)
+      return this.$store.state.smartNameLibrary
     }
   }
 }
@@ -65,5 +95,15 @@ li {
 }
 a {
   color: #42b983;
+}
+.smartname-info {
+   text-align: left;
+   position: center;
+}
+.smartname-card {
+   margin-left: 25%;
+   margin-right: 25%;
+   margin-top: 2%;
+   margin-bottom: 2%;
 }
 </style>
