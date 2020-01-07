@@ -11,7 +11,7 @@ import "@openzeppelin/contracts/payment/PullPayment.sol";
  * @author Steve Despres - @stevedespres - steve.despres@protonmail.com
  * @notice This contract represents a market of smart name. Users can put on sale and buy smart names registered on a SmartNameRegistry
  */
-contract SmartNameMarket is SmartNameService, PullPayment{
+contract SmartNameMarket is SmartNameService, PullPayment {
 
     /**
      * @notice Mapping of id and Item
@@ -29,7 +29,17 @@ contract SmartNameMarket is SmartNameService, PullPayment{
     mapping (bytes32 => uint) public indexes;
 
     /**
-     * @notice Number of smart names to sale
+     * @notice Mapping of smart names ids and their global index
+     */
+    mapping (bytes32 => uint) public globalIndexes;
+
+    /**
+     * @notice All items for sale
+     */
+    bytes32[] public allItems;
+
+    /**
+     * @notice Number of smart names for sale
      */
     uint public nbItemsTotal;
 
@@ -106,7 +116,7 @@ contract SmartNameMarket is SmartNameService, PullPayment{
      */
     modifier isOnSale(bytes32 _id)
     {
-        require(items[_id].smartName != SmartName(0x0), "Error: The smart name is not on sale");
+        require(isForSale(_id), "Error: The smart name is not on sale");
         _;
     }
 
@@ -116,8 +126,7 @@ contract SmartNameMarket is SmartNameService, PullPayment{
      */
     modifier isNotOnSale(bytes32 _id)
     {
-        require((items[_id].smartName == SmartName(0x0)),
-        "Error: The smart name is already on sale");
+        require(!isForSale(_id), "Error: The smart name is already on sale");
         _;
     }
 
@@ -131,7 +140,7 @@ contract SmartNameMarket is SmartNameService, PullPayment{
     /**
      * @notice Put on sale a smart name
      * @param _id id of a smart name
-     * @param _price price
+     * @param _price price (1ETH = 10^14)
      * @return id and price
      */
     function sell(bytes32 _id, uint _price, bytes32 _unlocker) public
@@ -145,6 +154,7 @@ contract SmartNameMarket is SmartNameService, PullPayment{
         Item memory item = Item(smartName, _price, _unlocker);
         items[_id] = item;
         nbItemsTotal++;
+        allItems.push(_id);
 
         // Update Seller
         address sellerAddress = items[_id].smartName.getAdministrator();
@@ -153,7 +163,8 @@ contract SmartNameMarket is SmartNameService, PullPayment{
         sellers[sellerAddress].nbItems++;
 
         // Update index in the wallet
-        indexes[_id] = sellers[sellerAddress].nbItems-1;
+        indexes[_id] = sellers[sellerAddress].items.length-1;
+        globalIndexes[_id] = allItems.length-1;
 
         emit LogForPutOnSaleOnMarket(_id, _price);
         return (_id, _price);
@@ -175,6 +186,7 @@ contract SmartNameMarket is SmartNameService, PullPayment{
 
     /**
      * @notice Buy a smart name on sale
+     * @dev (1ETH = 10^8 wei) <-> (price in ETH -> price * 10^4) <-> (price in wei -> price * 10^14)
      * @param _id id
      * @return id, price and buyer address
      */
@@ -183,11 +195,11 @@ contract SmartNameMarket is SmartNameService, PullPayment{
     {
         uint price = items[_id].price;
         address sellerAddress = items[_id].smartName.getAdministrator();
-        require(msg.value >= price, "Error : Not enough money to buy this smart name");
+        require(msg.value >= price * (10**14), "Error : Not enough money to buy this smart name");
         require(msg.sender != sellerAddress, "Error : You are already the administrator avec this smart name");
 
         // Payment
-        _asyncTransfer(sellerAddress, price);
+        _asyncTransfer(sellerAddress, price * (10**14));
 
         // Update SmartName
         smartNameRegistry.modifyAdministratorWithUnlocker(_id, msg.sender, items[_id].unlocker);
@@ -203,7 +215,7 @@ contract SmartNameMarket is SmartNameService, PullPayment{
     /**
      * @notice Modify the price of a smart name
      * @param _id id
-     * @param _newPrice new price
+     * @param _newPrice new price (1ETH = 10^4)
      * @return id, price
      */
     function modifyPrice(bytes32 _id, uint _newPrice) public payable
@@ -259,6 +271,16 @@ contract SmartNameMarket is SmartNameService, PullPayment{
     }
 
     /**
+     * @notice Get all items ids
+     * @return list of all items ids
+     */
+    function getAllItems() public view
+        returns(bytes32[] memory)
+    {
+        return allItems;
+    }
+
+    /**
      * @notice Get number of smart names on sale
      * @return number of smart names on sale
      */
@@ -266,6 +288,16 @@ contract SmartNameMarket is SmartNameService, PullPayment{
         returns(uint)
     {
         return nbItemsTotal;
+    }
+
+    /**
+     * @notice Check if a smart name is for sale
+     * @return true or false
+     */
+    function isForSale(bytes32 _id) public view
+        returns(bool)
+    {
+        return items[_id].smartName != SmartName(0x0);
     }
 
     /**
@@ -285,9 +317,11 @@ contract SmartNameMarket is SmartNameService, PullPayment{
 
         // Delete item
         delete items[_id];
+        delete allItems[globalIndexes[_id]];
         nbItemsTotal--;
 
         // Update index
         delete indexes[_id];
+        delete globalIndexes[_id];
     }
 }

@@ -86,10 +86,10 @@ export default {
       if (data.length === 2 && name.length > 0 && name.length <= 16 && ext.length > 0 && ext.length <= 4) {
         try {
           // Resolve
-          let id = await this.$store.state.smartNameRegistry.methods.getIdOf(this.toBytes(name), this.toBytes(ext)).call()
-          let record = await this.$store.state.smartNameResolver.methods.resolve(this.toBytes(name), this.toBytes(ext)).call()
-          let admin = await this.$store.state.smartNameResolver.methods.get(this.toBytes(name), this.toBytes(ext)).call()
-          let address = await this.$store.state.smartNameResolver.methods.get(this.toBytes(name), this.toBytes(ext)).call()
+          let id = await this.$store.state.smartNameRegistry.methods.getIdOf(this.toBytes(name), this.toBytes(ext)).call({ from: this.$store.state.accounts[0] })
+          let record = await this.$store.state.smartNameResolver.methods.resolve(this.toBytes(name), this.toBytes(ext)).call({ from: this.$store.state.accounts[0] })
+          let admin = await this.$store.state.smartNameResolver.methods.get(this.toBytes(name), this.toBytes(ext)).call({ from: this.$store.state.accounts[0] })
+          let address = await this.$store.state.smartNameResolver.methods.get(this.toBytes(name), this.toBytes(ext)).call({ from: this.$store.state.accounts[0] })
 
           this.smartName.id = id
           this.smartName.address = address
@@ -126,7 +126,7 @@ li {
   margin: 0 10px;
 }
 a {
-  color: #42b983;
+  color: #258;
 }
 .smartname-input {
   width: 50%;

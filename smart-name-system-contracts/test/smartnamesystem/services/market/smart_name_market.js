@@ -5,8 +5,9 @@ let SmartNameMarket = artifacts.require('SmartNameMarket')
 
 let catchRevert = require("../../../exceptionsHelpers.js").catchRevert
 let toBytes = function(input) { return web3.utils.fromAscii(input) }
+let toWei = function(input) { return input * Math.pow(10, 14) }
 
-contract('SmartName', function(accounts) {
+contract('SmartNameMarket', function(accounts) {
 
     const administrator = accounts[0]
     const user1 = accounts[1]
@@ -97,7 +98,7 @@ contract('SmartName', function(accounts) {
 
         it("Cancel sale of a smart name which is already sell", async() => { 
             await smartNameMarketInstance.sell(id1, 2, toBytes(unlocker))
-            await smartNameMarketInstance.buy(id1, {from: user1, value: 2})
+            await smartNameMarketInstance.buy(id1, {from: user1, value: toWei(2)})
 
             await catchRevert(smartNameMarketInstance.cancelSale(id1))
         })
@@ -107,7 +108,7 @@ contract('SmartName', function(accounts) {
 
         it("Buy a smart name", async() => {
             await smartNameMarketInstance.sell(id1, 2, toBytes(unlocker))
-            await smartNameMarketInstance.buy(id1, {from: user1, value: 2})
+            await smartNameMarketInstance.buy(id1, {from: user1, value: toWei(2)})
 
             await catchRevert(smartNameMarketInstance.getItem(id1))
 
@@ -123,31 +124,31 @@ contract('SmartName', function(accounts) {
             await smartNameMarketInstance.sell(id1, 2, toBytes(unlocker))
             await smartNameRegistryInstance.removeUnlocker(id1)
     
-            await catchRevert(smartNameMarketInstance.buy(id1, {from: user1, value: 2}))
+            await catchRevert(smartNameMarketInstance.buy(id1, {from: user1, value: toWei(2)}))
         })
 
         it("Buy a smart name with not enough money", async() => {
             await smartNameMarketInstance.sell(id1, 2, toBytes(unlocker))
 
-            await catchRevert(smartNameMarketInstance.buy(id1, {from: user1, value: 1}))
+            await catchRevert(smartNameMarketInstance.buy(id1, {from: user1, value: toWei(1)}))
         })
 
 
         it("Buy a smart name which is already owned", async() => {
             await smartNameMarketInstance.sell(id1, 2, toBytes(unlocker))
    
-            await catchRevert(smartNameMarketInstance.buy(id1, {value: 2}))
+            await catchRevert(smartNameMarketInstance.buy(id1, {value: toWei(2)}))
         })
 
         it("Buy a smart name which is not to buy", async() => {
-            await catchRevert(smartNameMarketInstance.buy(id1, {value: 2}))
+            await catchRevert(smartNameMarketInstance.buy(id1, {value: toWei(2)}))
         })
 
         it("Buy a smart name which is already sell", async() => {
             await smartNameMarketInstance.sell(id1, 2, toBytes(unlocker))
-            await smartNameMarketInstance.buy(id1, {from: user1, value: 2})
+            await smartNameMarketInstance.buy(id1, {from: user1, value: toWei(2)})
    
-            await catchRevert(smartNameMarketInstance.buy(id1, {value: 2}))
+            await catchRevert(smartNameMarketInstance.buy(id1, {value: toWei(2)}))
         })
     })
 
@@ -180,7 +181,7 @@ contract('SmartName', function(accounts) {
 
             assert.equal(await smartNameMarketInstance.getNbItemsTotal(), 1, 'The number of the smart name to sale is not correct')
 
-            await smartNameMarketInstance.buy(id2, {value: 2})
+            await smartNameMarketInstance.buy(id2, {value: toWei(2)})
 
             assert.equal(await smartNameMarketInstance.getNbItemsTotal(), 0, 'The number of the smart name to sale is not correct')            
         })
@@ -202,7 +203,7 @@ contract('SmartName', function(accounts) {
             assert.equal(result_items[0], id1, 'The id of items to sale is not correct')
             assert.equal(result_items[1], id3, 'The id of items to sale is not correct')
 
-            await smartNameMarketInstance.buy(id1, {from: user1, value: 2})
+            await smartNameMarketInstance.buy(id1, {from: user1, value: toWei(2)})
 
             result_seller = await smartNameMarketInstance.getSeller()
             result_address = result_seller[0]

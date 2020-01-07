@@ -8,7 +8,7 @@
       <form id="registry-form" @submit="send">
         <div class="form-group">
           <input  id="smartNameInput" v-model="smartNameInput" type="text" class="smartname-input" placeholder="Enter a smart name">
-          <input  id="amountInput" v-model="amountInput" type="text" class="amount-input" placeholder="ETH">
+          <input  id="amountInput" v-model="amountInput" type="number" step=0.000000000000000001 class="amount-input" placeholder="ETH">
           <small class="form-text text-muted">example : myname.com</small>
         </div>
         <button type="submit" class="btn btn-secondary">Send</button>
@@ -99,7 +99,7 @@ export default {
           }
           // Send ethers to smart name
           await this.$store.state.smartNameBanking.methods.send(this.toBytes(name), this.toBytes(ext)).send({ from: this.$store.state.accounts[0], value: this.amountInput * Math.pow(10, 18) })
-          let record = await this.$store.state.smartNameResolver.methods.resolve(this.toBytes(name), this.toBytes(ext)).call()
+          let record = await this.$store.state.smartNameResolver.methods.resolve(this.toBytes(name), this.toBytes(ext)).call({ from: this.$store.state.accounts[0] })
           this.infos.push(this.amountInput + ' ETH has been sent to ' + this.smartNameInput + '(' + record + ')')
           this.checkPendingPayments()
           this.success = true
@@ -114,7 +114,7 @@ export default {
       }
     },
     checkPendingPayments: async function () {
-      this.pendingPayments = await this.$store.state.smartNameBanking.methods.payments(this.$store.state.accounts[0]).call() / Math.pow(10, 18)
+      this.pendingPayments = await this.$store.state.smartNameBanking.methods.payments(this.$store.state.accounts[0]).call({ from: this.$store.state.accounts[0] }) / Math.pow(10, 18)
       this.canWithdraw = (this.pendingPayments > 0)
     },
     withdrawPayments: async function () {
@@ -138,7 +138,7 @@ li {
   margin: 0 10px;
 }
 a {
-  color: #42b983;
+  color: #258;
 }
 .smartname-input {
   width: 50%;

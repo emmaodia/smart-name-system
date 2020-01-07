@@ -90,10 +90,10 @@ export default {
           await this.$store.state.smartNameRegistry.methods.register(this.toBytes(name), this.toBytes(ext)).send({ from: this.$store.state.accounts[0] })
 
           // Get Id
-          let id = await this.$store.state.smartNameRegistry.methods.getIdOf(this.toBytes(name), this.toBytes(ext)).call()
+          let id = await this.$store.state.smartNameRegistry.methods.getIdOf(this.toBytes(name), this.toBytes(ext)).call({ from: this.$store.state.accounts[0] })
 
           // Get info
-          let smartNameInfo = await this.$store.state.smartNameRegistry.methods.getSmartName(id).call()
+          let smartNameInfo = await this.$store.state.smartNameRegistry.methods.getSmartName(id).call({ from: this.$store.state.accounts[0] })
 
           // Store smart name
           this.smartName.id = id
@@ -132,7 +132,7 @@ li {
   margin: 0 10px;
 }
 a {
-  color: #42b983;
+  color: #258;
 }
 .smartname-input {
   width: 50%;

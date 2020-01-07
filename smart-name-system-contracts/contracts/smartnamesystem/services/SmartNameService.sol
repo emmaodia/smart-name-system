@@ -2,12 +2,14 @@ pragma solidity ^0.5.0;
 
 import "../registry/SmartNameRegistry.sol";
 
+import "@openzeppelin/contracts/lifecycle/Pausable.sol";
+
 /**
  * @title SmartNameService
  * @author Steve Despres - @stevedespres - steve.despres@protonmail.com
  * @notice This contract represents a smart name service. It must be overrided by anothers childs contracts
  */
-contract SmartNameService{
+contract SmartNameService is Pausable {
 
     /**
      * @notice Extension

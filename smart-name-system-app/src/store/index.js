@@ -27,6 +27,8 @@ export const store = new Vuex.Store({
       stateCopy.contract = currentState.contract
       stateCopy.networkId = currentState.networkId
 
+      stateCopy.unlocker = currentState.unlocker
+
       stateCopy.smartNameRegistry = currentState.smartNameRegistry
       stateCopy.smartNameResolver = currentState.smartNameResolver
       stateCopy.smartNameBanking = currentState.smartNameBanking
@@ -80,6 +82,7 @@ export const store = new Vuex.Store({
         SmartNameLibrary.abi,
         deployedNetwork && deployedNetwork.address
       )
+
       commit('registerWeb3Instance', currentState)
     }
   }

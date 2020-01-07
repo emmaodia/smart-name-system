@@ -3,13 +3,15 @@ pragma solidity ^0.5.0;
 import "./SmartName.sol";
 import "../utils/SmartNameLibrary.sol";
 
+import "@openzeppelin/contracts/lifecycle/Pausable.sol";
+
 /**
  * @title SmartNameRegistry
  * @author Steve Despres - @stevedespres - steve.despres@protonmail.com
  * @notice This contract represents a register of smart name. Users can register and manage smart names, with traditionnal domain name format ("name"."ext"), and associate a record to this smart name. The record is an ethereum address.
  * @dev The smart name format is composed by "name" (bytes16) and "extension" (bytes4). The smart names have id, which is a keccak256 hash avec the "name" and "extension".
  */
-contract SmartNameRegistry{
+contract SmartNameRegistry is Pausable {
 
     /**
      * @notice Mapping of id and SmartName
@@ -150,7 +152,7 @@ contract SmartNameRegistry{
         administrators[msg.sender].nbSmartNames++;
 
         // Update index in the wallet
-        indexes[id] = administrators[msg.sender].nbSmartNames-1;
+        indexes[id] = administrators[msg.sender].wallet.length-1;
 
         emit LogForRegisterByRegistry(id, smartNames[id]);
         return (id, smartNames[id]);
