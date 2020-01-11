@@ -1,10 +1,9 @@
 # Design patterns decisions
 
-## Circuit Breaker (emergency stop)
+## Circuit Breaker (emergency stop)
 
 The SmartNameRegistry and SmartNameService contracts implement a Circuit Breaker design pattern to manage their lifecycle. They use the Pausable.sol contract provided by OpenZeppelin: 
 https://docs.openzeppelin.com/contracts/2.x/api/lifecycle
-
 
 ## Restricting access
 
@@ -16,7 +15,7 @@ The access and operations on contracts are restricted :
 The SmartName contract uses the Secondary.sol contract provided by OpenZeppelin: 
 https://docs.openzeppelin.com/contracts/2.x/api/ownership
 
-## Pull over push payments
+## Pull over oush payments
 
 In order to prevent a Denial of Service or Re-entrency attakcs, contracts use Withrawal design pattern. Payments are realized using the PullPaiement contract provided by OpenZeppelin: 
 https://docs.openzeppelin.com/contracts/2.x/api/payment#PullPayment
@@ -29,6 +28,6 @@ For each methods, the conditions are checked as soon as possible with 'require()
 
 Mortal design pattern is used in the same way as Circuit Breaker design pattern to manage the lifecycle of the contracts.
 
-## Upgradable
+## Upgradable
 
 The application is developed to be upgradable. Services contracts can be created inheriting the SmartNameService contract (like SmartNameResolver, SmartNameBanking and SmartNameMarket). Facade design pattern is used.
