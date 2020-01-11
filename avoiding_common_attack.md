@@ -4,7 +4,7 @@
 
 To optimize the gas, so the cost of use, the contracts not use loop and work with fixed size bytes arrays.
 
-## Pull payment strategy
+## Pull Payment strategy
 
 Pull payment strategy is used to avoiding re-entrency attacks and denial of service. It's implemented with the PullPayment.sol contract provided by OpenZeppelin: 
 https://docs.openzeppelin.com/contracts/2.x/api/payment#PullPayment
@@ -13,17 +13,17 @@ https://docs.openzeppelin.com/contracts/2.x/api/payment#PullPayment
 
 The contracts not use timestamp conditions in these transactions. 
 
-# Integer overflow / underflow 
+## Integer overflow / underflow 
 
 Integer parameters provided by users are checked in all methods to control the value. 
 
-# Lifecycle control
+## Lifecycle control
 
 The lifecycle of contracts is managed using Pausable.sol contract provided by OpenZeppelin: 
 https://docs.openzeppelin.com/contracts/2.x/api/lifecycle
 Contracts can be stopped or destructed.
 
-# Access control
+## Access control
 
 The access and operations on contracts are restricted : 
 - SmartName can only be managed by its primary account (the one that ceated it, SmartNameRegistry) 
