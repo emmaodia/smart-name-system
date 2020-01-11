@@ -1,7 +1,6 @@
 # Smart Name System
 
-
-## Project
+## Project
 
 ### Description
 
@@ -11,8 +10,7 @@
 
 ## Technical description
 
-
-### Technologies
+### Technologies
 
 ### Architecture
 
