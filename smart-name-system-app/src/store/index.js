@@ -14,7 +14,6 @@ export const store = new Vuex.Store({
   state,
   mutations: {
     registerWeb3Instance (state, payload) {
-      console.log('registerWeb3instance Mutation being executed', payload)
       let currentState = payload
       let stateCopy = state
 

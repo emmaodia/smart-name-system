@@ -2,7 +2,7 @@
   <div class="banking">
     <div class="hello">
       <h1>Banking</h1>
-        <p>Send ethers to smart name. Ethers is send to the record address associated to the smart name.</p>
+        <p>Send ethers to smart name. Ethers is send to the record address associated with the smart name.</p>
     </div>
     <div>
       <form id="registry-form" @submit="send">
@@ -100,7 +100,7 @@ export default {
           // Send ethers to smart name
           await this.$store.state.smartNameBanking.methods.send(this.toBytes(name), this.toBytes(ext)).send({ from: this.$store.state.accounts[0], value: this.amountInput * Math.pow(10, 18) })
           let record = await this.$store.state.smartNameResolver.methods.resolve(this.toBytes(name), this.toBytes(ext)).call({ from: this.$store.state.accounts[0] })
-          this.infos.push(this.amountInput + ' ETH has been sent to ' + this.smartNameInput + '(' + record + ')')
+          this.infos.push(this.amountInput + ' ETH has been sent to ' + this.smartNameInput + ' (' + record + ')')
           this.checkPendingPayments()
           this.success = true
           return true

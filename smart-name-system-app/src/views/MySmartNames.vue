@@ -244,7 +244,10 @@ export default {
       try {
         // Get administrator info
         let adminInfo = await this.$store.state.smartNameRegistry.methods.getAdministrator().call({ from: this.$store.state.accounts[0] })
+
         let smartNamesIds = adminInfo[2]
+
+        console.log(smartNamesIds)
 
         // Get all smart names
         for (let i = 0; i < smartNamesIds.length; i++) {

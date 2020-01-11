@@ -4,6 +4,17 @@
       <h1>Market</h1>
         <p>You can view smart names to sale and buy them</p>
     </div>
+    <div v-if="canWithdraw">
+      <form id="registry-form" @submit="withdrawPayments">
+        <div class="card smartname-card">
+          <div class="card-header bg-success text-white">Payments</div>
+          <div class="card-body smartname-info">
+            <p>You have sell smart names for {{ pendingPayments / Math.pow(10, 4) }} ETH</p>
+            <button type="submit" class="btn btn-secondary">Withdraw</button>
+          </div>
+        </div>
+      </form>
+    </div>
     <div v-if="infos.length">
         <div class="card smartname-card">
           <div class="card-header bg-success text-white">Success</div>
@@ -29,11 +40,7 @@
               <p><b>Address: </b>{{ item.address }}</p>
               <p><b>Administrator: </b>{{ item.administrator }}</p>
               <p><b>Price: </b>{{ item.price / Math.pow(10, 4) }} ETH</p>
-              <form @submit="buy()">
-                <p class="smartname-manager">
-                    <button type="button" class="btn btn-success smartname-btn" data-toggle="modal" data-target="#buyModal" v-on:click="selectCurrentItem(item)">Buy</button>
-                </p>
-              </form>
+              <button type="button" class="btn btn-success smartname-btn" data-toggle="modal" data-target="#buyModal" v-on:click="selectCurrentItem(item)">Buy</button>
           </div>
         </div>
       </div>
@@ -58,17 +65,6 @@
           </div>
         </form>
       </div>
-    </div>
-      <div v-if="canWithdraw">
-      <form id="registry-form" @submit="withdrawPayments">
-        <div class="card smartname-card">
-          <div class="card-header bg-secondary text-white">Payments</div>
-          <div class="card-body smartname-info">
-            <p>You have sell smart names for {{ pendingPayments }} ETH</p>
-            <button type="submit" class="btn btn-secondary">Withdraw</button>
-          </div>
-        </div>
-      </form>
     </div>
     <div v-if="!success && !errors.length">
       <div class="spinner-grow text-primary" role="status">
@@ -178,7 +174,6 @@ export default {
       }
     },
     buy: async function () {
-      console.log('BUY ' + this.currentItem.id)
       try {
         if (this.currentItem.price > this.$store.state.balance / Math.pow(10, 4)) {
           this.errors.push('You have not enough money')
@@ -192,8 +187,9 @@ export default {
 
         // Buy smart name
         await this.$store.state.smartNameMarket.methods.buy(this.currentItem.id).send({ from: this.$store.state.accounts[0], value: this.currentItem.price * Math.pow(10, 14) })
-        this.infos.push(this.toAscii(this.currentItem.name) + '.' + this.toAscii(this.currentItem.ext) + ' has been purchased for ' + this.currentItem.price / Math.pow(10, 4) + ' ETH')
+        console.log('ICI')
         this.getAllSmartNamesToSale()
+        this.infos.push(this.currentItem.name + '.' + this.currentItem.ext + ' has been purchased for ' + this.currentItem.price / Math.pow(10, 4) + ' ETH')
         this.success = true
         return true
       } catch (error) {

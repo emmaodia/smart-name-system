@@ -158,6 +158,21 @@ contract SmartNameRegistry is Pausable {
         return (id, smartNames[id]);
     }
 
+    /**
+     * @notice Register the smart name. The administrator and the record of the smart name are set up.
+     * @param _id id
+     * @param _name name
+     * @param _ext extension
+     */
+    function registerSmartName(bytes32 _id, bytes16 _name, bytes4 _ext) private
+    {
+        if(smartNames[_id] == SmartName(0x0)) {
+            smartNames[_id] = new SmartName(_id, _name, _ext, msg.sender, msg.sender);
+        } else {
+            smartNames[_id].setAdministrator(msg.sender);
+            smartNames[_id].setRecord(msg.sender);
+        }
+    }
 
     /**
      * @notice Abandon a smart name
@@ -190,7 +205,9 @@ contract SmartNameRegistry is Pausable {
         address administrator = smartNames[_id].getAdministrator();
 
         // Delete smart name
-        abandonSmartName(smartNames[_id]);
+        smartNames[_id].setAdministrator(address(0x0));
+        smartNames[_id].setRecord(address(0x0));
+
         nbSmartNamesTotal--;
 
         // Update Administrator
@@ -419,31 +436,5 @@ contract SmartNameRegistry is Pausable {
         returns (bytes32)
     {
         return SmartNameLibrary.getIdOf(_name, _ext);
-    }
-
-    /**
-     * @notice Abandon the smart name. The contract is not deleted but the administrator and the record are reset to address(0x0)
-     * @param smartName SmartName contract
-     */
-    function abandonSmartName(SmartName smartName) private
-    {
-        smartName.setAdministrator(address(0x0));
-        smartName.setRecord(address(0x0));
-    }
-
-    /**
-     * @notice Register the smart name. The administrator and the record of the smart name are set up.
-     * @param _id id
-     * @param _name name
-     * @param _ext extension
-     */
-    function registerSmartName(bytes32 _id, bytes16 _name, bytes4 _ext) private
-    {
-        if(smartNames[_id] == SmartName(0x0)) {
-            smartNames[_id] = new SmartName(_id, _name, _ext, msg.sender, msg.sender);
-        } else {
-            smartNames[_id].setAdministrator(msg.sender);
-            smartNames[_id].setRecord(msg.sender);
-        }
     }
 }

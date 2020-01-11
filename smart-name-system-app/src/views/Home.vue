@@ -3,7 +3,7 @@
     <div class="hello">
       <h1>Smart Name System</h1>
         <p>Smart Name System is a decentralized application that allows to register and manage smart names.</p>
-        <p> A smart name is a name with the same form that a traditionnal domain name (name.extension).</p>
+        <p>A smart name is a name with the same form that a traditionnal domain name (name.extension).</p>
         <p>This application offers several services</p>
         <li><b>Registry</b></li>
         <li><b>Resolver</b></li>
