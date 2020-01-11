@@ -1,5 +1,6 @@
 # Smart Name System
 
+
 ## Project
 
 ### Description
@@ -9,6 +10,7 @@
 ### Possible improvements
 
 ## Technical description
+
 
 ### Technologies
 
