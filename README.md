@@ -23,7 +23,7 @@ This application generate a smart contract for each name registered. That allows
 
 ## Concepts
 
-### *SmartName*
+### SmartName
 
 A **SmartName** is a name with the same form as a traditional domain name `name.tld` (test.com, steve.fr, etc.).
 The `name` is limited to 16 characters and the `tld` to 4 characters. They are no restrictions on the content of the `name` and `tld`  unlike the registers of traditional domain names.
