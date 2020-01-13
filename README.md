@@ -164,8 +164,7 @@ If error of type `not found compiled contract`, delete `/build/contract` folder
 
 ### Go to application
 
-Go to `localhost:8080`
-Enjoy
+Go to `localhost:8080`and enjoy
 
 
 
