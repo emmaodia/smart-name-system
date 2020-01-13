@@ -11,7 +11,7 @@ https://docs.openzeppelin.com/contracts/2.x/api/payment#PullPayment
 
 ## No timestamp dependance
 
-The contracts not use timestamp conditions in these transactions. 
+The contracts not use timestamp conditions in their transactions. 
 
 ## Integer overflow / underflow 
 
