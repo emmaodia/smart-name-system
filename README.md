@@ -59,7 +59,7 @@ To create services and provide some applications with these SmartNames, a **Smar
  ### Banking
 **SmartNameBanking** is a service that allows to send Ethers to a SmartName. Amount of Ethers is sent to the record address associated with the SmartName. 
 
- ### *Market*
+ ### Market
 **SmartNameMarket** is a marketplace that allows to put on sale and buy SmartNames.
 
 
