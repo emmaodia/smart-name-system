@@ -10,7 +10,7 @@ https://docs.openzeppelin.com/contracts/2.x/api/lifecycle
 The access and operations on contracts are restricted : 
 - SmartName can only be managed by its primary account (the one that ceated it, SmartNameRegistry) 
 - Only the administrator (owner) of a SmartName can manage it using SmartNameRegistry
-- Smart Names must be unlocked to be managed by a service
+- SmartNames must be unlocked to be managed by a service
 
 The SmartName contract uses the Secondary.sol contract provided by OpenZeppelin: 
 https://docs.openzeppelin.com/contracts/2.x/api/ownership
@@ -22,11 +22,11 @@ https://docs.openzeppelin.com/contracts/2.x/api/payment#PullPayment
 
 ## Fail early and fail loud 
 
-For each methods, the conditions are checked as soon as possible with 'require()'.
+For each methods, the conditions are checked as soon as possible with `require()`.
 
 ## Mortal
 
-Mortal design pattern is used in the same way as Circuit Breaker design pattern to manage the lifecycle of the contracts.
+Mortal design pattern is used in the same way as Circuit Breaker to manage the lifecycle of the contracts.
 
 ## Upgradable
 
