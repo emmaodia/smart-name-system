@@ -2,8 +2,8 @@
 #  Smart Name System
 
 ## Description
-A decentralized application build with Solidity for Ethereum Blockchain. 
-Provide a name registry and some services.
+A decentralized application built with Solidity for Ethereum Blockchain. 
+It provides a name registry and some services.
 This application has been built as final project during the [Consensys Developer Bootcamp](https://consensys.net/academy/bootcamp/)
 It's composed of several smart contracts and a web application.
 
@@ -13,19 +13,19 @@ Demo:
 
 ## Features
 
-- Register and manage name with the same form as tradtional domain name (ex: mywebsite.org)
-- Associate ethereum public address to a name, to not memorize a complex address (ex: b3f719b6ccec8fb5eb9deeefa5e013c673f464d1 )
+- Register and manage names with the same format as tradtional domain names (ex: mywebsite.org)
+- Associate Ethereum public address to a name, to not memorize a complex address (ex: 0x137DCF94E2DEFF923e0A609b1d877BE9288243C8 )
 - Send crypto currencies to a name
 - Buy / Sell names on a marketplace
 - Resolve names
 
-This application generate a smart contract for each name registered. That allows to represents a name by an asset, to certify it and create a proof of existence on Blockchain. Moreover, the name can be exchanged without third party service. 
+This application generates a smart contract for each name registered. That allows to represent a name by an asset, to certify it and create a proof of existence on Blockchain. Moreover, the name can be exchanged without third party service. 
 
 ## Concepts
 
 ### SmartName
 
-A **SmartName** is a name with the same form as a traditional domain name `name.tld` (test.com, steve.fr, etc.).
+A **SmartName** is a name with the same format as a traditional domain name `name.tld` (test.com, steve.fr, etc.).
 The `name` is limited to 16 characters and the `tld` to 4 characters. They are no restrictions on the content of the `name` and `tld`  unlike the registers of traditional domain names.
 A Smart Name is composed of : 
 
@@ -44,7 +44,7 @@ A **SmartNameRegistry** allows to manage the SmartNames. Users can use the regis
  - **Modify the record associated** with a SmartName
  - **Get informations** about SmartNames registered
 
-The implementation of the registry implements some design patterns to manage access, to control contract life cycle and provide security.
+The implementation of the registry implements some design patterns to manage access, to control contract life cycle and to provide security.
 
  ### Services
 To create services and provide some applications with these SmartNames, a **SmartNameService** contract can be used. It provides an interface that allows to communicate with the SmartNameRegistry. 
@@ -60,7 +60,7 @@ To create services and provide some applications with these SmartNames, a **Smar
 **SmartNameBanking** is a service that allows to send Ethers to a SmartName. Amount of Ethers is sent to the record address associated with the SmartName. 
 
  ### *Market*
-**SmartNameMarket** is a marketplace that allows to put on sale and buy SmartName.
+**SmartNameMarket** is a marketplace that allows to put on sale and buy SmartNames.
 
 
 ## Possible improvements
@@ -74,14 +74,14 @@ Several things can be improved :
 - Bridge between **smart names** and **domain names** to **protect identify**
 	- A no restrictions registry allows anybody to register any names ; it's can be problematic like with the domain names, with [phishing](https://en.wikipedia.org/wiki/Phishing) and [cybersquatting](https://en.wikipedia.org/wiki/Cybersquatting)
 	- To prevent that, we can **restrict the register** of a smart name only to the **real owner of the same domain name**. For example, if Bob wants to register the smart name bob.com, he should register the domain name bob.com with a registrar (Cloudflare, OVH, etc.). These restrictions can be applied only with existent extensions.
-	- To do that, it's possible to certify the ownership of the domain name with DNSSEC and add a TXT record with an Ethreum public address. During the register of the smart name, the contract can verify that the Ethereum address of the caller matches with the TXT record of the domain name. This system is already used by Ethereum Name Service and an oracle exists : https://github.com/ensdomains/dnssec-oracle
+	- To do that, it's possible to certify the ownership of the domain name with DNSSEC and add a TXT record with an Ethereum public address. During the register of the smart name, the contract can verify that the Ethereum address of the user matches with the TXT record of the domain name. This system is already used by Ethereum Name Service and an oracle exists : https://github.com/ensdomains/dnssec-oracle
 - **Re-organize** registry contract
-	- Actually, one contract can only support `name.tld` names. To manage subdomains (`sub.name.tld`) and better organize the data, I think it will be better to take example of a traditional system of domain names. 
+	- Actually, one contract can only support this format : `name.tld`. To manage subdomains (`sub.name.tld`) and better organize the data, I think it will be better to take example of a traditional system of domain names. 
 ![System of Domain Names](https://zupimages.net/up/20/02/jsz4.png
 )
 	- Each level can be represented by a smart contract
 - Fix some **bugs**
-- Implements **others design patterns** to manage roles, store list of names, optimize gas, etc. 
+- Implement **others design patterns** to manage roles, store list of names, optimize gas, etc. 
 - Audit **security** 
 
 # Technical description
