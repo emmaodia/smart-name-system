@@ -79,7 +79,7 @@ Several things can be improved :
 - SmartName as **non-fungible token**
 	- SmartNames are unique object, with their own properties. So, they can be represented with a standard non-fungible token like [ERC-721](http://erc721.org/). 
 
-- Bridge between **smart names** and **domain names** to **protect identify**
+- Bridge between **smart names** and **domain names** to **protect identity**
 	- A no restrictions registry allows anybody to register any names ; it's can be problematic like with the domain names, with [phishing](https://en.wikipedia.org/wiki/Phishing) and [cybersquatting](https://en.wikipedia.org/wiki/Cybersquatting)
 	- To prevent that, we can **restrict the register** of a smart name only to the **real owner of the same domain name**. For example, if Bob wants to register the smart name bob.com, he should register the domain name bob.com with a registrar (Cloudflare, OVH, etc.). These restrictions can be applied only with existent extensions.
 	- To do that, it's possible to certify the ownership of the domain name with DNSSEC and add a TXT record with an Ethereum public address. During the register of the smart name, the contract can verify that the Ethereum address of the user matches with the TXT record of the domain name. This system is already used by Ethereum Name Service and an oracle exists : https://github.com/ensdomains/dnssec-oracle
